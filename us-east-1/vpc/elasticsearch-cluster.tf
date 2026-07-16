@@ -6,5 +6,6 @@ resource "aws_instance" "elasticsearch" {
 
   tags = {
     Name = "es-node-${count.index + 1}"
+    Service = "elasticsearch"
   }
 }

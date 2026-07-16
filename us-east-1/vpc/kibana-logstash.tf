@@ -5,5 +5,6 @@ resource "aws_instance" "kibana" {
 
   tags = {
     Name = "kibana"
+    Service = "kibana"
   }
 }
