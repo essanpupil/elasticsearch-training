@@ -71,6 +71,30 @@ resource "aws_security_group" "nat_sg" {
   }
 }
 
+resource "aws_security_group" "nat_sg_data" {
+  name        = "data-nat-instance-sg"
+  description = "Allow private subnet traffic to egress to the private subnet"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = [aws_subnet.data.cidr_block]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "data-nat-instance-sg"
+  }
+}
+
 resource "aws_instance" "nat" {
   ami           = data.aws_ami.fck_nat.id
   instance_type = "t4g.nano"
@@ -81,6 +105,19 @@ resource "aws_instance" "nat" {
 
   tags = {
     Name = "nat-instance"
+  }
+}
+
+resource "aws_instance" "nat_data" {
+  ami           = data.aws_ami.fck_nat.id
+  instance_type = "t4g.nano"
+  subnet_id     = aws_subnet.private.id
+
+  vpc_security_group_ids = [aws_security_group.nat_sg_data.id]
+  source_dest_check      = false
+
+  tags = {
+    Name = "data-nat-instance"
   }
 }
 
@@ -122,6 +159,12 @@ resource "aws_route_table_association" "private" {
 
 resource "aws_route_table" "data" {
   vpc_id = aws_vpc.main.id
+
+
+  route {
+    cidr_block           = "0.0.0.0/0"
+    network_interface_id = aws_instance.nat_data.primary_network_interface_id
+  }
 
   tags = {
     Name = "data-route-table"
