@@ -28,15 +28,15 @@ resource "aws_iam_instance_profile" "kibana" {
 }
 
 resource "aws_instance" "kibana" {
-  ami                    = "ami-0c7217cdde317cfec"
-  instance_type          = "t2.micro"
-  subnet_id              = aws_subnet.private.id
+  ami                  = "ami-0c7217cdde317cfec"
+  instance_type        = "t2.micro"
+  subnet_id            = aws_subnet.private.id
   iam_instance_profile = aws_iam_instance_profile.kibana.id
   vpc_security_group_ids = [
     aws_security_group.ec2_ssm_sg.id
   ]
   tags = {
-    Name = "kibana"
+    Name    = "kibana"
     Service = "kibana"
   }
 }

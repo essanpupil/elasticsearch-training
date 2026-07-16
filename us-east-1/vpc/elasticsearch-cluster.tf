@@ -28,17 +28,17 @@ resource "aws_iam_instance_profile" "elasticsearch" {
 }
 
 resource "aws_instance" "elasticsearch" {
-  count                  = 3
-  ami                    = "ami-0c7217cdde317cfec"
-  instance_type          = "t2.micro"
-  subnet_id              = aws_subnet.data.id
+  count                = 3
+  ami                  = "ami-0c7217cdde317cfec"
+  instance_type        = "t2.micro"
+  subnet_id            = aws_subnet.data.id
   iam_instance_profile = aws_iam_instance_profile.elasticsearch.id
   vpc_security_group_ids = [
     aws_security_group.ec2_ssm_sg.id
   ]
 
   tags = {
-    Name = "es-node-${count.index + 1}"
+    Name    = "es-node-${count.index + 1}"
     Service = "elasticsearch"
   }
 }

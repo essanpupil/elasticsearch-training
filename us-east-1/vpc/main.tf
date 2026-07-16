@@ -75,9 +75,9 @@ resource "aws_instance" "nat" {
   ami           = data.aws_ami.fck_nat.id
   instance_type = "t4g.nano"
   subnet_id     = aws_subnet.public.id
-  
+
   vpc_security_group_ids = [aws_security_group.nat_sg.id]
-  source_dest_check = false 
+  source_dest_check      = false
 
   tags = {
     Name = "nat-instance"
@@ -106,8 +106,8 @@ resource "aws_route_table" "private" {
   vpc_id = aws_vpc.main.id
 
   route {
-    cidr_block  = "0.0.0.0/0"
-    network_interface_id  = aws_instance.nat.primary_network_interface_id
+    cidr_block           = "0.0.0.0/0"
+    network_interface_id = aws_instance.nat.primary_network_interface_id
   }
 
   tags = {
