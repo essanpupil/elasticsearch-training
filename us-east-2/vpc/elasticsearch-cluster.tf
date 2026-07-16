@@ -29,7 +29,7 @@ resource "aws_iam_instance_profile" "elasticsearch" {
 
 resource "aws_instance" "elasticsearch" {
   count                = 3
-  ami                  = data.aws_ami.debian.id
+  ami                  = "ami-06fa3e561475dbbb4"
   instance_type        = "t4g.micro"
   subnet_id            = aws_subnet.data.id
   iam_instance_profile = aws_iam_instance_profile.elasticsearch.id
