@@ -132,3 +132,19 @@ resource "aws_route_table_association" "data" {
   subnet_id      = aws_subnet.data.id
   route_table_id = aws_route_table.data.id
 }
+
+resource "aws_security_group" "ec2_ssm_sg" {
+  name        = "ec2-ssm-security-group"
+  description = "Allow outbound HTTPS traffic for SSM"
+  vpc_id      = aws_vpc.main.id
+
+  # No inbound rules are needed for SSM
+
+  egress {
+    description = "Allow HTTPS outbound to SSM endpoints"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
