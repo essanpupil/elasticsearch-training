@@ -40,30 +40,30 @@
         group: kibana
         mode: '0660'
 
-    - name: Create Kibana keystore file if missing
-      ansible.builtin.command:
-        cmd: "{{ kibana_home }}/bin/kibana-keystore create"
-      args:
-        creates: "{{ kibana_config_dir }}/kibana.keystore"
+    # - name: Create Kibana keystore file if missing
+    #   ansible.builtin.command:
+    #     cmd: "{{ kibana_home }}/bin/kibana-keystore create"
+    #   args:
+    #     creates: "{{ kibana_config_dir }}/kibana.keystore"
 
-    - name: Check existing Kibana keys to prevent redundant tasks
-      ansible.builtin.shell:
-        cmd: "{{ kibana_home }}/bin/kibana-keystore list"
-      register: kibana_keys_list
-      changed_when: false
+    # - name: Check existing Kibana keys to prevent redundant tasks
+    #   ansible.builtin.shell:
+    #     cmd: "{{ kibana_home }}/bin/kibana-keystore list"
+    #   register: kibana_keys_list
+    #   changed_when: false
 
-    - name: Add elasticsearch.password to Kibana keystore
-      ansible.builtin.shell:
-        cmd: "echo '{{ shared_cluster_password }}' | {{ kibana_home }}/bin/kibana-keystore add elasticsearch.password --stdin --force"
-      when: "'elasticsearch.password' not in kibana_keys_list.stdout_lines"
-      # no_log: true
+    # - name: Add elasticsearch.password to Kibana keystore
+    #   ansible.builtin.shell:
+    #     cmd: "echo '{{ shared_cluster_password }}' | {{ kibana_home }}/bin/kibana-keystore add elasticsearch.password --stdin --force"
+    #   when: "'elasticsearch.password' not in kibana_keys_list.stdout_lines"
+    #   # no_log: true
 
-    - name: Restrict Kibana keystore file permissions
-      ansible.builtin.file:
-        path: "{{ kibana_config_dir }}/kibana.keystore"
-        owner: kibana
-        group: kibana
-        mode: '0660'
+    # - name: Restrict Kibana keystore file permissions
+    #   ansible.builtin.file:
+    #     path: "{{ kibana_config_dir }}/kibana.keystore"
+    #     owner: kibana
+    #     group: kibana
+    #     mode: '0660'
 
     - name: Start and enable Kibana service
       ansible.builtin.systemd_service:
