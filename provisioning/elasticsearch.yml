@@ -117,3 +117,5 @@ http.host: 0.0.0.0
 transport.host: 0.0.0.0
 
 #----------------------- END SECURITY AUTO CONFIGURATION -------------------------
+
+xpack.monitoring.collection.enabled: true
