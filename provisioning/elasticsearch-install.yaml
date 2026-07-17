@@ -94,7 +94,7 @@
       when: inventory_hostname == 'node1'
       command: >
         /usr/share/elasticsearch/bin/elasticsearch-certutil cert 
-        --silent --in /tmp/instances.yml --out /tmp/certs.zip
+        --silent --in /tmp/instances.yml --out /tmp/certs.zip --self-signed
       args:
         creates: /tmp/certs.zip
 
