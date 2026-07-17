@@ -66,7 +66,6 @@
     #     mode: '0660'
 
     - name: Create certs directory
-      when: inventory_hostname == 'node1'
       file:
         path: /usr/share/elasticsearch/config/certs
         state: directory
@@ -133,19 +132,17 @@
     #     flat: true
 
     - name: Ensure target certs directory exists
-      when: inventory_hostname != 'node1'
       file:
-        path: /usr/share/elasticsearch/config/certs
+        path: /etc/elasticsearch/certs
         state: directory
         owner: elasticsearch
         group: elasticsearch
         mode: '0750'
 
     - name: Copy specific node certificate
-      when: inventory_hostname != 'node1'
       copy:
         src: "/tmp/fetched_certs/{{ inventory_hostname }}.p12"
-        dest: "/usr/share/elasticsearch/config/certs/node.p12"
+        dest: "/etc/elasticsearch/certs/node.p12"
         owner: elasticsearch
         group: elasticsearch
         mode: '0640'
