@@ -1,9 +1,9 @@
 terraform {
   backend "s3" {
-    bucket         = "terraform-state-803309190098"
-    key            = "us-east-2/vpc/terraform.tfstate"
-    region         = "us-east-2"
-    encrypt        = true
+    bucket  = "terraform-state-803309190098"
+    key     = "us-east-2/vpc/terraform.tfstate"
+    region  = "us-east-2"
+    encrypt = true
   }
   required_providers {
     aws = {

@@ -23,7 +23,19 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "public-subnet"
+    Name = "public-subnet-a"
+  }
+}
+
+resource "aws_subnet" "public_b" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.4.0/24"
+  availability_zone = "us-east-2b"
+
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "public-subnet-b"
   }
 }
 
@@ -120,6 +132,12 @@ resource "aws_instance" "nat_data" {
     Name = "data-nat-instance"
   }
 }
+
+resource "aws_route_table_association" "public_b" {
+  subnet_id      = aws_subnet.public_b.id
+  route_table_id = aws_route_table.public.id
+}
+
 
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
