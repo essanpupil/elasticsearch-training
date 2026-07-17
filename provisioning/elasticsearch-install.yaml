@@ -47,7 +47,7 @@
         printf "{{ shared_cluster_password }}!\n{{ shared_cluster_password }}!\n" | /usr/share/elasticsearch/bin/elasticsearch-reset-password -u kibana_system -b -i
       args:
         executable: /bin/bash
-      no_log: true
+      # no_log: true
 
 
     # - name: Create Elasticsearch keystore file if missing
