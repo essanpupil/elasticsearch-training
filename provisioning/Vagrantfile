@@ -1,0 +1,34 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "cloud-image/amazon-linux-2023"
+  config.vm.box_version = "12.20260710.0"
+
+  # Define the Virtual Machines
+  vms = {
+    "es-node-1" => { "ip" => "192.168.1.51", "ram" => 2048 },
+    "es-node-2" => { "ip" => "192.168.1.52", "ram" => 2048 },
+    "es-node-3" => { "ip" => "192.168.1.53", "ram" => 2048 },
+    "logstash"  => { "ip" => "192.168.1.54", "ram" => 1024 },
+    "kibana"    => { "ip" => "192.168.1.55", "ram" => 1024 }
+  }
+
+  # Loop to generate each machine automatically
+  vms.each do |hostname, settings|
+    config.vm.define hostname do |node|
+      node.vm.hostname = hostname
+      
+      # Bridged network with static IP configuration
+      node.vm.network "public_network", 
+        bridge: "en0: Wi-Fi",
+        ip: settings["ip"]
+
+      # Hardware resource allocation
+      node.vm.provider "virtualbox" do |v|
+        v.memory = settings["ram"]
+        v.cpus = 1
+      end
+    end
+  end
+end
