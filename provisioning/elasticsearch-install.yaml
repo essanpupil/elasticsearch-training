@@ -33,12 +33,12 @@
         state: restarted
         enabled: yes
 
-    - name: Download http_ca.crt to the local Ansible controller
-      when: inventory_hostname == 'node1'
-      ansible.builtin.fetch:
-        src: /etc/elasticsearch/certs/http_ca.crt
-        dest: /tmp/fetched_certs/
-        flat: true
+    # - name: Download http_ca.crt to the local Ansible controller
+    #   when: inventory_hostname == 'node1'
+    #   ansible.builtin.fetch:
+    #     src: /etc/elasticsearch/certs/http_ca.crt
+    #     dest: /tmp/fetched_certs/
+    #     flat: true
 
     - name: Set hardcoded password for kibana_system non-interactively
       when: inventory_hostname == 'node1'
@@ -151,20 +151,20 @@
         group: elasticsearch
         mode: '0640'
 
-    - name: Inject TLS configuration into elasticsearch.yml
-      when: inventory_hostname != 'node1'
-      blockinfile:
-        path: /etc/elasticsearch/elasticsearch.yml
-        marker: "# {mark} ANSIBLE MANAGED TLS CONFIG #"
-        block: |
-          xpack.security.transport.ssl.enabled: true
-          xpack.security.transport.ssl.verification_mode: certificate
-          xpack.security.transport.ssl.keystore.path: certs/node.p12
-          xpack.security.transport.ssl.truststore.path: certs/node.p12
+    # - name: Inject TLS configuration into elasticsearch.yml
+    #   when: inventory_hostname != 'node1'
+    #   blockinfile:
+    #     path: /etc/elasticsearch/elasticsearch.yml
+    #     marker: "# {mark} ANSIBLE MANAGED TLS CONFIG #"
+    #     block: |
+    #       xpack.security.transport.ssl.enabled: true
+    #       xpack.security.transport.ssl.verification_mode: certificate
+    #       xpack.security.transport.ssl.keystore.path: certs/node.p12
+    #       xpack.security.transport.ssl.truststore.path: certs/node.p12
 
-          xpack.security.http.ssl.enabled: true
-          xpack.security.http.ssl.keystore.path: certs/node.p12
-          xpack.security.http.ssl.truststore.path: certs/node.p12
+    #       xpack.security.http.ssl.enabled: true
+    #       xpack.security.http.ssl.keystore.path: certs/node.p12
+    #       xpack.security.http.ssl.truststore.path: certs/node.p12
 
     - name: Restart Elasticsearch
       service:
