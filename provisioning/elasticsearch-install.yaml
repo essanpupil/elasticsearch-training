@@ -74,3 +74,99 @@
     #     owner: root
     #     group: elasticsearch
     #     mode: '0660'
+
+    - name: Create certs directory
+      when: inventory_hostname == 'node1'
+      file:
+        path: /usr/share/elasticsearch/config/certs
+        state: directory
+        owner: elasticsearch
+        group: elasticsearch
+        mode: '0750'
+
+    - name: Generate Instance YAML file for certutil
+      when: inventory_hostname == 'node1'
+      copy:
+        dest: /tmp/instances.yml
+        content: |
+          instances:
+            - name: "node1"
+              dns: [ "ip-10-0-3-27.us-east-2.compute.internal" ]
+              ip: [ "10.0.3.27" ]
+            - name: "node2"
+              dns: [ "ip-10-0-3-214.us-east-2.compute.internal" ]
+              ip: [ "10.0.3.214" ]
+            - name: "node3"
+              dns: [ "ip-10-0-3-200.us-east-2.compute.internal" ]
+              ip: [ "10.0.3.200" ]
+
+    - name: Generate CA and Node Certs zip archive
+      when: inventory_hostname == 'node1'
+      command: >
+        /usr/share/elasticsearch/bin/elasticsearch-certutil cert 
+        --silent --in /tmp/instances.yml --out /tmp/certs.zip
+      args:
+        creates: /tmp/certs.zip
+
+    - name: Unzip the certificates package
+      when: inventory_hostname == 'node1'
+      unarchive:
+        src: /tmp/certs.zip
+        dest: /tmp/
+        remote_src: true
+
+    - name: Fetch certificates to Ansible controller lake
+      when: inventory_hostname == 'node1'
+      fetch:
+        src: "/tmp/{{ item }}/{{ item }}.p12"
+        dest: "/tmp/fetched_certs/{{ item }}.p12"
+        flat: true
+      loop:
+        - node1
+        - node2
+        - node3
+
+    - name: Fetch CA certificate specifically
+      when: inventory_hostname == 'node1'
+      fetch:
+        src: /tmp/ca/ca.crt
+        dest: /tmp/fetched_certs/ca.crt
+        flat: true
+
+    - name: Ensure target certs directory exists
+      when: inventory_hostname != 'node1'
+      file:
+        path: /usr/share/elasticsearch/config/certs
+        state: directory
+        owner: elasticsearch
+        group: elasticsearch
+        mode: '0750'
+
+    - name: Copy specific node certificate
+      when: inventory_hostname != 'node1'
+      copy:
+        src: "/tmp/fetched_certs/{{ inventory_hostname }}.p12"
+        dest: "/usr/share/elasticsearch/config/certs/node.p12"
+        owner: elasticsearch
+        group: elasticsearch
+        mode: '0640'
+
+    - name: Inject TLS configuration into elasticsearch.yml
+      when: inventory_hostname != 'node1'
+      blockinfile:
+        path: /etc/elasticsearch/elasticsearch.yml
+        marker: "# {mark} ANSIBLE MANAGED TLS CONFIG #"
+        block: |
+          xpack.security.transport.ssl.enabled: true
+          xpack.security.transport.ssl.verification_mode: certificate
+          xpack.security.transport.ssl.keystore.path: certs/node.p12
+          xpack.security.transport.ssl.truststore.path: certs/node.p12
+
+          xpack.security.http.ssl.enabled: true
+          xpack.security.http.ssl.keystore.path: certs/node.p12
+          xpack.security.http.ssl.truststore.path: certs/node.p12
+
+    - name: Restart Elasticsearch
+      service:
+        name: elasticsearch
+        state: restarted

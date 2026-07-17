@@ -16,21 +16,21 @@
         name: kibana
         state: present
 
-    - name: Create certs directory on Kibana host if missing
-      ansible.builtin.file:
-        path: "{{ kibana_cert_dir }}"
+    - name: Ensure Kibana certs directory exists
+      file:
+        path: /etc/kibana/certs
         state: directory
         owner: kibana
         group: kibana
         mode: '0750'
 
-    - name: Upload http_ca.crt from Ansible controller to Kibana host
-      ansible.builtin.copy:
-        src: /tmp/fetched_certs/http_ca.crt
-        dest: "{{ kibana_cert_dir }}/http_ca.crt"
+    - name: Push CA certificate to Kibana server
+      copy:
+        src: /tmp/fetched_certs/ca.crt
+        dest: /etc/kibana/certs/ca.crt
         owner: kibana
         group: kibana
-        mode: '0640'
+        mode: '0644'
 
     - name: Deploy Kibana configuration
       ansible.builtin.template:

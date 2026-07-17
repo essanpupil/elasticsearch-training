@@ -90,10 +90,10 @@ xpack.reporting.encryptionKey: 4122ecc0699f6c04597ead64d6bf614d28dcf1da60a566641
 xpack.security.encryptionKey: 4d3fd6a199deda0819c856b6c1185ec3dabd0a6d48ae779380b3afb26682a814
 # Enables you to specify a path to the PEM file for the certificate
 # authority for your Elasticsearch instance.
-elasticsearch.ssl.certificateAuthorities: [ "{{ kibana_cert_dir }}/http_ca.crt" ]
+elasticsearch.ssl.certificateAuthorities: [ "/etc/kibana/certs/ca.crt" ]
 
 # To disregard the validity of SSL certificates, change this setting's value to 'none'.
-#elasticsearch.ssl.verificationMode: full
+elasticsearch.ssl.verificationMode: certificate
 
 # =================== System: Logging ===================
 # Set the value of this setting to off to suppress all logging output, or to debug to log everything. Defaults to 'info'
