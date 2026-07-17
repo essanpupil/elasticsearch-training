@@ -104,8 +104,7 @@
     - name: Generate CA and Node Certs zip archive
       when: inventory_hostname == 'node1'
       command: >
-        /usr/share/elasticsearch/bin/elasticsearch-certutil cert 
-        --silent --in /tmp/instances.yml --out /tmp/es-certs.zip --self-signed
+        /usr/share/elasticsearch/bin/elasticsearch-certutil cert --silent --in /tmp/instances.yml --out /tmp/es-certs.zip --self-signed
       args:
         creates: /tmp/es-certs.zip
 
