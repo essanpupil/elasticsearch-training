@@ -1,7 +1,7 @@
 all:
   hosts:
     bastion_server:
-      ansible_host: 10.0.2.31
+      ansible_host: 10.0.2.179
       ansible_user: ec2-user
   children:
     kibana:
@@ -12,11 +12,11 @@ all:
     elasticsearch:
       hosts:
         node1:
-          ansible_host: 10.0.3.231
+          ansible_host: 10.0.3.27
           ansible_user: ec2-user
         node2:
-          ansible_host: 10.0.3.97
+          ansible_host: 10.0.3.214
           ansible_user: ec2-user
         node3:
-          ansible_host: 10.0.3.49
+          ansible_host: 10.0.3.200
           ansible_user: ec2-user
