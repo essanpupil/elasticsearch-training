@@ -21,3 +21,5 @@
    5. change user from ssm-user to `ec2-user`
    6. generate ssh keypair
    7. Copy generate ssh public key to note text.
+5. Deploy Elasticsearch nodes
+   1. Add ssh pub key of bastion in previous note text to all elasticsearch instance
