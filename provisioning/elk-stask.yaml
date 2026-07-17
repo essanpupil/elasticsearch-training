@@ -24,6 +24,13 @@
         name: kibana
         state: present
 
+    - name: Configure Kibana to listen on all interfaces
+      lineinfile:
+        path: /etc/kibana/kibana.yml
+        regexp: '^#?server\.host:'
+        line: 'server.host: "0.0.0.0"'
+        state: present
+
     - name: Start and enable Kibana service
       when: "'kibana' in group_names"
       ansible.builtin.service:
