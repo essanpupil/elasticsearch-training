@@ -16,4 +16,10 @@ terraform {
 # Configure the AWS Provider
 provider "aws" {
   region = "us-east-2"
+  default_tags {
+    tags = {
+      Owner     = "Ikhsan"
+      ManagedBy = "Terraform"
+    }
+  }
 }
