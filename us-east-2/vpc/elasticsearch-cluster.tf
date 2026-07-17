@@ -17,11 +17,6 @@ resource "aws_iam_role" "elasticsearch" {
   assume_role_policy = data.aws_iam_policy_document.elasticsearch.json
 }
 
-resource "aws_iam_role_policy_attachment" "elasticsearch_ssm_attach" {
-  role       = aws_iam_role.elasticsearch.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-}
-
 resource "aws_iam_instance_profile" "elasticsearch" {
   name = "es-nodes-profile"
   role = aws_iam_role.elasticsearch.name
