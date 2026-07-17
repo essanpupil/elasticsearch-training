@@ -1,0 +1,63 @@
+---
+- name: install elasticsearch logstash and kibana
+  hosts: elasticsearch
+  gather_facts: true
+  become: true
+  vars:
+    kibana_cert_dir: /etc/kibana/certs
+    shared_cluster_password: "SuperSecureClusterPassword2026!"
+    es_home: "/usr/share/elasticsearch"
+    es_config_dir: "/etc/elasticsearch"
+    kibana_home: "/usr/share/kibana"
+    kibana_config_dir: "/etc/kibana"
+  tasks:
+    - name: Install Elasticsearch
+      ansible.builtin.dnf:
+        name: "elasticsearch"
+        state: present
+        enablerepo: elasticsearch
+
+    - name: Deploy Elasticsearch configuration
+      ansible.builtin.template:
+        src: elasticsearch.yml
+        dest: /etc/elasticsearch/elasticsearch.yml
+        owner: root
+        group: elasticsearch
+        mode: '0660'
+
+    - name: Enable and start Elasticsearch service
+      ansible.builtin.systemd_service:
+        name: elasticsearch
+        state: restarted
+        enabled: yes
+
+    - name: Download http_ca.crt to the local Ansible controller
+      ansible.builtin.fetch:
+        src: /etc/elasticsearch/certs/http_ca.crt
+        dest: /tmp/fetched_certs/
+        flat: true
+
+    - name: Create Elasticsearch keystore file if missing
+      when: inventory_hostname == 'node1'
+      ansible.builtin.command:
+        cmd: "{{ es_home }}/bin/elasticsearch-keystore create"
+      args:
+        creates: "{{ es_config_dir }}/elasticsearch.keystore"
+
+    - name: Add bootstrap.password to Elasticsearch keystore
+      when: inventory_hostname == 'node1'
+      ansible.builtin.command:
+        cmd: "{{ es_home }}/bin/elasticsearch-keystore add -xf bootstrap.password"
+      args:
+        stdin: "{{ shared_cluster_password }}"
+      # no_log: true
+      register: es_secret_cmd
+      changed_when: "'already exists' not in es_secret_cmd.stdout"
+
+    - name: Restrict Elasticsearch keystore file permissions
+      when: inventory_hostname == 'node1'
+      ansible.builtin.file:
+        path: "{{ es_config_dir }}/elasticsearch.keystore"
+        owner: root
+        group: elasticsearch
+        mode: '0660'
