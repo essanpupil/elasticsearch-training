@@ -97,7 +97,7 @@ xpack.security.enrollment.enabled: true
 xpack.security.http.ssl:
   enabled: true
   keystore.path: certs/node.p12
-  truststore.path: certs/http.p12
+  certificate_authorities: [ "certs/ca.crt" ]
 
 # Enable encryption and mutual authentication between cluster nodes
 xpack.security.transport.ssl:
