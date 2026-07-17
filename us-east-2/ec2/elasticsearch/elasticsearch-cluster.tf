@@ -20,6 +20,14 @@ resource "aws_security_group" "this" {
   }
 }
 
+resource "aws_vpc_security_group_ingress_rule" "elasticsearch_access" {
+  security_group_id = aws_security_group.this.id
+  referenced_security_group_id = data.terraform_remote_state.kibana.outputs.security_group_id
+  from_port   = 9200
+  ip_protocol = "tcp"
+  to_port     = 9200
+}
+
 resource "aws_vpc_security_group_ingress_rule" "allow_ssh_from_bastion" {
   security_group_id = aws_security_group.this.id
   referenced_security_group_id = data.terraform_remote_state.bastion.outputs.security_group_id

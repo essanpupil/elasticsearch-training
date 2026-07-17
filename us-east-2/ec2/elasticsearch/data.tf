@@ -17,3 +17,13 @@ data "terraform_remote_state" "bastion" {
     region = "us-east-2"
   }
 }
+
+data "terraform_remote_state" "kibana" {
+  backend = "s3"
+
+  config = {
+    bucket = "terraform-state-803309190098"
+    key    = "us-east-2/ec2/kibana/terraform.tfstate"
+    region = "us-east-2"
+  }
+}
