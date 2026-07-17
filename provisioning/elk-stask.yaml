@@ -116,7 +116,7 @@
     - name: Add elasticsearch.password to Kibana keystore
       ansible.builtin.shell:
         cmd: "echo '{{ shared_cluster_password }}' | {{ kibana_home }}/bin/kibana-keystore add elasticsearch.password --stdin --force"
-      when: "'elasticsearch.password' not in kibana_keys_list.stdout and 'kibana' in group_names"
+      when: "'elasticsearch.password' not in kibana_keys_list.stdout and 'server1' in inventory_hostname"
       # no_log: true
 
     - name: Restrict Kibana keystore file permissions
