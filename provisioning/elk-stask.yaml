@@ -113,6 +113,12 @@
       register: kibana_keys_list
       changed_when: false
 
+    - name: Print Kibana keystore keys line-by-line
+      ansible.builtin.debug:
+        msg: "Found keys: {{ kibana_keys_list }}"
+      when: 
+        - kibana_keys_list.stdout_lines is defined
+
     - name: Add elasticsearch.password to Kibana keystore
       ansible.builtin.shell:
         cmd: "echo '{{ shared_cluster_password }}' | {{ kibana_home }}/bin/kibana-keystore add elasticsearch.password --stdin --force"
