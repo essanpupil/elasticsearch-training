@@ -125,12 +125,12 @@
         - node2
         - node3
 
-    - name: Fetch CA certificate specifically
-      when: inventory_hostname == 'node1'
-      fetch:
-        src: /tmp/ca/ca.crt
-        dest: /tmp/fetched_certs/ca.crt
-        flat: true
+    # - name: Fetch CA certificate specifically
+    #   when: inventory_hostname == 'node1'
+    #   fetch:
+    #     src: /tmp/ca/ca.crt
+    #     dest: /tmp/fetched_certs/ca.crt
+    #     flat: true
 
     - name: Ensure target certs directory exists
       when: inventory_hostname != 'node1'
