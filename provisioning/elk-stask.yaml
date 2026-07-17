@@ -5,6 +5,11 @@
   become: true
   vars:
     kibana_cert_dir: /etc/kibana/certs
+    shared_cluster_password: "SuperSecureClusterPassword2026!"
+    es_home: "/usr/share/elasticsearch"
+    es_config_dir: "/etc/elasticsearch"
+    kibana_home: "/usr/share/kibana"
+    kibana_config_dir: "/etc/kibana"
   tasks:
     - name: Install Elasticsearch
       when: "'elasticsearch' in group_names"
@@ -36,6 +41,30 @@
         dest: /tmp/fetched_certs/
         flat: true
 
+    - name: Create Elasticsearch keystore file if missing
+      when: inventory_hostname == 'node1'
+      ansible.builtin.command:
+        cmd: "{{ es_home }}/bin/elasticsearch-keystore create"
+      args:
+        creates: "{{ es_config_dir }}/elasticsearch.keystore"
+
+    - name: Add bootstrap.password to Elasticsearch keystore
+      when: inventory_hostname == 'node1'
+      ansible.builtin.command:
+        cmd: "{{ es_home }}/bin/elasticsearch-keystore add --stdin bootstrap.password"
+      stdin: "{{ shared_cluster_password }}"
+      no_log: true
+      register: es_secret_cmd
+      changed_when: "'already exists' not in es_secret_cmd.stdout"
+
+    - name: Restrict Elasticsearch keystore file permissions
+      when: inventory_hostname == 'node1'
+      ansible.builtin.file:
+        path: "{{ es_config_dir }}/elasticsearch.keystore"
+        owner: root
+        group: elasticsearch
+        mode: '0660'
+
     - name: Install Kibana
       when: "'kibana' in group_names"
       ansible.builtin.yum:
@@ -66,6 +95,34 @@
         src: kibana.yml
         dest: /etc/kibana/kibana.yml
         owner: root
+        group: kibana
+        mode: '0660'
+
+    - name: Create Kibana keystore file if missing
+      when: "'kibana' in group_names"
+      ansible.builtin.command:
+        cmd: "{{ kibana_home }}/bin/kibana-keystore create"
+      args:
+        creates: "{{ kibana_config_dir }}/kibana.keystore"
+
+    - name: Check existing Kibana keys to prevent redundant tasks
+      when: "'kibana' in group_names"
+      ansible.builtin.shell:
+        cmd: "{{ kibana_home }}/bin/kibana-keystore list"
+      register: kibana_keys_list
+      changed_when: false
+
+    - name: Add elasticsearch.password to Kibana keystore
+      ansible.builtin.shell:
+        cmd: "echo '{{ shared_cluster_password }}' | {{ kibana_home }}/bin/kibana-keystore add elasticsearch.password --stdin --force"
+      when: "'elasticsearch.password' not in kibana_keys_list.stdout and 'kibana' in group_names"
+      no_log: true
+
+    - name: Restrict Kibana keystore file permissions
+      when: "'kibana' in group_names"
+      ansible.builtin.file:
+        path: "{{ kibana_config_dir }}/kibana.keystore"
+        owner: kibana
         group: kibana
         mode: '0660'
 
