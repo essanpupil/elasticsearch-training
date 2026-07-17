@@ -54,7 +54,7 @@
         cmd: "{{ es_home }}/bin/elasticsearch-keystore add --stdin bootstrap.password"
       args:
         stdin: "{{ shared_cluster_password }}"
-      no_log: true
+      # no_log: true
       register: es_secret_cmd
       changed_when: "'already exists' not in es_secret_cmd.stdout"
 
