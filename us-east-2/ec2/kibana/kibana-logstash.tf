@@ -16,7 +16,7 @@ resource "aws_security_group" "this" {
   vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
 
   tags = {
-    Name = "es-nodes-sg"
+    Name = "kibana-sg"
   }
 }
 
@@ -51,7 +51,7 @@ resource "aws_iam_instance_profile" "kibana" {
 resource "aws_instance" "kibana" {
   ami                  = "ami-06fa3e561475dbbb4"
   instance_type        = "t4g.small"
-  subnet_id            = data.terraform_remote_state.vpc.outputs.data_subnet_id
+  subnet_id            = data.terraform_remote_state.vpc.outputs.private_subnet_id
   iam_instance_profile = aws_iam_instance_profile.kibana.id
   vpc_security_group_ids = [
     aws_security_group.this.id
