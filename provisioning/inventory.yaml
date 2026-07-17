@@ -6,17 +6,21 @@ all:
           ansible_host: 10.0.3.253
           ansible_user: ec2-user
           ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
+          ansible_python_interpreter: /usr/bin/python3.9
     elasticsearch:
       hosts:
         node1:
           ansible_host: 10.0.3.27
           ansible_user: ec2-user
           ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
+          ansible_python_interpreter: /usr/bin/python3.9
         node2:
           ansible_host: 10.0.3.214
           ansible_user: ec2-user
           ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
+          ansible_python_interpreter: /usr/bin/python3.9
         node3:
           ansible_host: 10.0.3.200
           ansible_user: ec2-user
           ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
+          ansible_python_interpreter: /usr/bin/python3.9
