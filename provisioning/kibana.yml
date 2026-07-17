@@ -50,7 +50,7 @@ elasticsearch.hosts: ["https://10.0.3.27:9200", "https://10.0.3.214:9200", "http
 # index at startup. Your Kibana users still need to authenticate with Elasticsearch, which
 # is proxied through the Kibana server.
 #elasticsearch.username: "kibana_system"
-#elasticsearch.password: "pass"
+elasticsearch.password: "${elasticsearch.password}"
 
 # Kibana can also authenticate to Elasticsearch via "service account tokens".
 # Service account tokens are Bearer style tokens that replace the traditional username/password based configuration.
