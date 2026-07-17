@@ -51,7 +51,7 @@
     - name: Add bootstrap.password to Elasticsearch keystore
       when: inventory_hostname == 'node1'
       ansible.builtin.command:
-        cmd: "{{ es_home }}/bin/elasticsearch-keystore add --stdin bootstrap.password"
+        cmd: "{{ es_home }}/bin/elasticsearch-keystore add -xf bootstrap.password"
       args:
         stdin: "{{ shared_cluster_password }}"
       # no_log: true
