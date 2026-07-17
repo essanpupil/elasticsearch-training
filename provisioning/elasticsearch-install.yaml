@@ -90,20 +90,23 @@
               dns: [ "ip-10-0-3-200.us-east-2.compute.internal" ]
               ip: [ "10.0.3.200" ]
 
-    - name: Generate CA and Node Certs zip archive
-      when: inventory_hostname == 'node1'
+    - name: Clean up old corrupted certs and files
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /tmp/certs.zip
+        - /tmp/ca
+        - /tmp/node1
+        - /tmp/node2
+        - /tmp/node3
+
+    - name: Generate CA and Node Certs directly to disk
       command: >
         /usr/share/elasticsearch/bin/elasticsearch-certutil cert 
-        --silent --in /tmp/instances.yml --out /tmp/certs.zip --self-signed
+        --silent --in /tmp/instances.yml --out /tmp --self-signed
       args:
-        creates: /tmp/certs.zip
-
-    - name: Unzip the certificates package
-      when: inventory_hostname == 'node1'
-      unarchive:
-        src: /tmp/certs.zip
-        dest: /tmp/
-        remote_src: true
+        creates: /tmp/ca/ca.crt
 
     - name: Fetch certificates to Ansible controller lake
       when: inventory_hostname == 'node1'
