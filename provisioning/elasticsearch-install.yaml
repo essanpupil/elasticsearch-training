@@ -135,9 +135,9 @@
       file:
         path: /etc/elasticsearch/certs
         state: directory
-        owner: elasticsearch
+        owner: root
         group: elasticsearch
-        mode: '0750'
+        mode: '0640'
 
     - name: Copy specific node certificate
       copy:
