@@ -85,7 +85,9 @@ elasticsearch.password: "{{ shared_cluster_password }}"
 # xpack.security.http.ssl.client_authentication in Elasticsearch is set to required.
 #elasticsearch.ssl.certificate: /path/to/your/client.crt
 #elasticsearch.ssl.key: /path/to/your/client.key
-
+xpack.encryptedSavedObjects.encryptionKey: 294603a70cd44a16e0ad68e8f9cf0b4dd215426beddf7fe379c513f3e6f00fc7
+xpack.reporting.encryptionKey: 4122ecc0699f6c04597ead64d6bf614d28dcf1da60a566641006d0a8e4620ac5
+xpack.security.encryptionKey: 4d3fd6a199deda0819c856b6c1185ec3dabd0a6d48ae779380b3afb26682a814
 # Enables you to specify a path to the PEM file for the certificate
 # authority for your Elasticsearch instance.
 elasticsearch.ssl.certificateAuthorities: [ "{{ kibana_cert_dir }}/http_ca.crt" ]
