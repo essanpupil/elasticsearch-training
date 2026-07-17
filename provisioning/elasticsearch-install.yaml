@@ -101,10 +101,17 @@
         - /tmp/node2
         - /tmp/node3
 
-    - name: Generate CA and Node Certs directly to disk
+    # Explicitly use a specific zip filename destination to avoid directory errors
+    - name: Generate CA and Node Certs zip archive
       command: >
         /usr/share/elasticsearch/bin/elasticsearch-certutil cert 
-        --silent --in /tmp/instances.yml --out /tmp --self-signed
+        --silent --in /tmp/instances.yml --out /tmp/es-certs.zip --self-signed
+      args:
+        creates: /tmp/es-certs.zip
+
+    # To guarantee a robust extraction that never conflicts with Ansible's internal unarchiver plugins
+    - name: Extract certificates package using system unzip
+      command: unzip -o /tmp/es-certs.zip -d /tmp/
       args:
         creates: /tmp/ca/ca.crt
 
