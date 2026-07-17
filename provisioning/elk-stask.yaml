@@ -11,8 +11,8 @@
         state: present
         enablerepo: elasticsearch
 
-    - name: Deploy Kibana configuration
-      when: "'kibana' in group_names"
+    - name: Deploy Elasticsearch configuration
+      when: "'elasticsearch' in group_names"
       ansible.builtin.copy:
         src: elasticsearch.yml
         dest: /etc/elasticsearch/elasticsearch.yml
