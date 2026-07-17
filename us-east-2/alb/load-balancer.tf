@@ -70,3 +70,20 @@ resource "aws_lb_listener" "kibana_listener" {
     target_group_arn = aws_lb_target_group.kibana_tg.arn
   }
 }
+
+# resource "aws_lb_listener" "kibana_listener_https" {
+#   load_balancer_arn = aws_lb.kibana_alb.arn
+#   port              = "443"
+#   protocol          = "HTTPS"
+
+#   default_action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.kibana_tg.arn
+#   }
+# }
+
+resource "aws_lb_target_group_attachment" "web_tg_attachment" {
+  target_group_arn = aws_lb_target_group.kibana_tg.arn
+  target_id        = data.terraform_remote_state.kibana.outputs.instance_id
+  port             = 5601
+}
