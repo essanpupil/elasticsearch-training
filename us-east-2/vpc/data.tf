@@ -8,12 +8,3 @@ data "aws_ami" "fck_nat" {
   }
 }
 
-data "aws_ami" "debian" {
-  most_recent = true
-  owners      = ["136693071363"] # Official fck-nat AWS account ID
-
-  filter {
-    name   = "name"
-    values = ["debian-13-arm64-*-*"]
-  }
-}
