@@ -20,3 +20,7 @@
         gpgcheck: true
         gpgkey: https://artifacts.elastic.co/GPG-KEY-elasticsearch
         enabled: true
+
+    - name: Update DNF cache
+      ansible.builtin.dnf:
+        update_cache: true
