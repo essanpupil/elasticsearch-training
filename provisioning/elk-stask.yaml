@@ -13,7 +13,7 @@
 
     - name: Deploy Elasticsearch configuration
       when: "'elasticsearch' in group_names"
-      ansible.builtin.copy:
+      ansible.builtin.template:
         src: elasticsearch.yml
         dest: /etc/elasticsearch/elasticsearch.yml
         owner: root
@@ -35,7 +35,7 @@
 
     - name: Deploy Kibana configuration
       when: "'kibana' in group_names"
-      ansible.builtin.copy:
+      ansible.builtin.template:
         src: kibana.yml
         dest: /etc/kibana/kibana.yml
         owner: root
