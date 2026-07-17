@@ -43,7 +43,7 @@ server.host: "0.0.0.0"
 
 # =================== System: Elasticsearch ===================
 # The URLs of the Elasticsearch instances to use for all your queries.
-elasticsearch.hosts: ["http://10.0.3.27:9200", "http://10.0.3.214:9200", "http://10.0.3.200:9200"]
+elasticsearch.hosts: ["https://10.0.3.27:9200", "https://10.0.3.214:9200", "https://10.0.3.200:9200"]
 
 # If your Elasticsearch is protected with basic authentication, these settings provide
 # the username and password that the Kibana server uses to perform maintenance on the Kibana
