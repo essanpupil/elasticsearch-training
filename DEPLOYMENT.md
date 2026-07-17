@@ -23,3 +23,5 @@
    7. Copy generate ssh public key to note text.
 5. Deploy Elasticsearch nodes
    1. Add ssh pub key of bastion in previous note text to all elasticsearch instance
+6. Deploy Kibana server
+   1. Add ssh pub key of bastion in previous note text to kibana server

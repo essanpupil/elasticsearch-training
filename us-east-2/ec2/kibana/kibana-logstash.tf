@@ -11,6 +11,32 @@ data "aws_iam_policy_document" "kibana" {
   }
 }
 
+resource "aws_security_group" "this" {
+  name        = "kibana-sg"
+  vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
+
+  tags = {
+    Name = "es-nodes-sg"
+  }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow_ssh_from_bastion" {
+  security_group_id = aws_security_group.this.id
+  referenced_security_group_id = data.terraform_remote_state.bastion.outputs.security_group_id
+
+  from_port   = 22
+  to_port     = 22
+  ip_protocol = "tcp"
+}
+
+resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv4" {
+  security_group_id = aws_security_group.this.id
+  description       = "Allow all outbound traffic"
+
+  cidr_ipv4   = "0.0.0.0/0"
+  ip_protocol = "-1"
+}
+
 resource "aws_iam_role" "kibana" {
   name               = "kibana-role"
   path               = "/"
@@ -25,11 +51,10 @@ resource "aws_iam_instance_profile" "kibana" {
 resource "aws_instance" "kibana" {
   ami                  = "ami-06fa3e561475dbbb4"
   instance_type        = "t4g.small"
-  subnet_id            = aws_subnet.private.id
+  subnet_id            = data.terraform_remote_state.vpc.outputs.data_subnet_id
   iam_instance_profile = aws_iam_instance_profile.kibana.id
   vpc_security_group_ids = [
-    aws_security_group.ec2_ssm_sg.id,
-    aws_security_group.bastion_sg.id
+    aws_security_group.this.id
   ]
   user_data = <<-EOF
     #!/bin/bash
@@ -42,7 +67,7 @@ resource "aws_instance" "kibana" {
 
     mkdir -p "$SSH_DIR"
 
-    REMOTE_PUB_HOST_KEY="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCdy8jkIhN5Y76gMKCgWKJ6ps5aIY7lMg6xCqoLtR9KraOfSG4Rv6AnXgmWGbI7+3oDOnnC9xiIfNNIebNzypwV403BkieU7FdTbmP2btmlDm7WsV9FwQDk4iFGVXbITOD2ov+hAy2BJPOc8xgjdUkXYjeBW8HShG88KlKSEefGVYItthCbv0aqsqHT7/Y+/mc37XozYhVBeyU7xXwq45TbggrV8BReVTXAB11Zjgkwl4GAb96tiSpQUhYtOBMEgS8rTP4so/nz/YzDVwWtWGFZxEOSh48SEyRErHP8TV7yibqGOz/qLzc67OqLhM6K1JqETVoW3Ib44nmt82FOPVaJDrBfGhBgYe5J5JPb4TTE4dOuRySjB+K63NaeL+lv634rskZEG/DAPx7SZmawr5KbIbsOUJ84irSG4tHQK1KCZo88U3e3ZjDwpuqYkZk2Gjmc5CP8Y7gmdrnoeyoW86H8/8tnBtJjTUetotq37UYR2W+Ty16WAAQgqo5T3RdwllU= ec2-user@ip-10-0-2-31.us-east-2.compute.internal" 
+    REMOTE_PUB_HOST_KEY="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC2uyBm+4okNZMf5dsZWZd9hzTmqS15xL8xVwarSxuA2G08KxVeRDzBJTDcHAin70BNaYAfP0+p/7u1VejmaQ3nwoWwEqwpsbb4VlFmxi3LeJqGupVbN+Hoj7MqZCZAP1mAUJKMqayJuBkGe7b9cJcPlvHD6sgM6mfiA/BJwil4UIWAd2imhhqe7J9x6/54+pp9HvXh0SPqYgeLZHw4gbN/vTiEl3DmMSgKQxaOTqSxsb/5PXsaq60swGa8ZR2tBrWQ3ZEcuUYAkHwglbrVcX3k99ntAKDIX+2PZytFVYP6v2nkPqQETeIX7oP7dri46ohHQfEunIjjPGorOGkFSXAMW90maHk3zLoqVkgxDzmfrtffmciB1utRwG2rFT2ajTPUyZnx09JayFopYtn+uY4HHjwtkQn0far4yPxJlnhO7mI8iwHQrL4I8/mn37QL9+ZUdbYTg8XnquwRKBljoxOeSJ6DRqh7nAalYuzRzUZz7x66i+sF80FJlkh4aVaRJS8= ec2-user@ip-10-0-2-179.us-east-2.compute.internal" 
     echo "$REMOTE_PUB_HOST_KEY" >> "$SSH_DIR/authorized_keys"
 
     # 4. Enforce strict permissions required by SSH
