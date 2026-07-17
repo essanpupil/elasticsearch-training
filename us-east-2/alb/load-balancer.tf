@@ -87,3 +87,13 @@ resource "aws_lb_target_group_attachment" "web_tg_attachment" {
   target_id        = data.terraform_remote_state.kibana.outputs.instance_id
   port             = 5601
 }
+
+
+resource "aws_vpc_security_group_ingress_rule" "allow_connection_from_bastion" {
+  security_group_id = data.terraform_remote_state.kibana.outputs.security_group_id
+  referenced_security_group_id = aws_security_group.this.id
+
+  from_port   = 5601
+  to_port     = 5601
+  ip_protocol = "tcp"
+}
