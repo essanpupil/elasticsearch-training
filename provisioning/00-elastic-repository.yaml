@@ -4,7 +4,7 @@
   become: true
   vars:
     elastic_version: "9.x" # Or specify exact version like 8.13.0
-  elastic_major_version: "9"
+    elastic_major_version: "9"
 
   tasks:
     - name: Import Elastic GPG Key
