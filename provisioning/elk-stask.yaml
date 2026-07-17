@@ -49,43 +49,33 @@
         state: restarted
         enabled: yes
 
-    - name: Install Logstash and Beats
-      ansible.builtin.dnf:
-        name:
-          - logstash
-          - filebeat
-          - metricbeat
-        state: present
-        update_cache: true
-      when: "'kibana' in group_names"
-
     - name: Install Logstash and Beats on Kibana group hosts
       ansible.builtin.dnf:
         name:
           - logstash
           - filebeat
           - metricbeat
-        state: present
+        state: absent
         update_cache: true
       when: "'kibana' in group_names"
 
-    - name: Restart logstash
-      when: "'kibana' in group_names"
-      ansible.builtin.systemd_service:
-        name: logstash
-        state: restarted
-        enabled: true
+    # - name: Restart logstash
+    #   when: "'kibana' in group_names"
+    #   ansible.builtin.systemd_service:
+    #     name: logstash
+    #     state: restarted
+    #     enabled: true
 
-    - name: Restart filebeat
-      when: "'kibana' in group_names"
-      ansible.builtin.systemd_service:
-        name: filebeat
-        state: restarted
-        enabled: true
+    # - name: Restart filebeat
+    #   when: "'kibana' in group_names"
+    #   ansible.builtin.systemd_service:
+    #     name: filebeat
+    #     state: restarted
+    #     enabled: true
 
-    - name: Restart metricbeat
-      when: "'kibana' in group_names"
-      ansible.builtin.systemd_service:
-        name: metricbeat
-        state: restarted
-        enabled: true
+    # - name: Restart metricbeat
+    #   when: "'kibana' in group_names"
+    #   ansible.builtin.systemd_service:
+    #     name: metricbeat
+    #     state: restarted
+    #     enabled: true
