@@ -1,7 +1,7 @@
 resource "aws_security_group" "bastion_sg" {
   name        = "bastion-public-sg"
   description = "Allow SSH inbound traffic"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
 
   tags = {
     Name = "bastion-security-group"
@@ -59,7 +59,7 @@ resource "aws_iam_instance_profile" "bastion" {
 resource "aws_instance" "bastion" {
   ami                    = "ami-06fa3e561475dbbb4"
   instance_type          = "t4g.micro"
-  subnet_id              = aws_subnet.private.id
+  subnet_id              = data.terraform_remote_state.vpc.outputs.private_subnet_id
   vpc_security_group_ids = [aws_security_group.bastion_sg.id]
   iam_instance_profile   = aws_iam_instance_profile.bastion.id
 
