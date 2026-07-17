@@ -3,6 +3,8 @@
   hosts: all
   gather_facts: true
   become: true
+  vars:
+    kibana_cert_dir: /etc/kibana/certs
   tasks:
     - name: Install Elasticsearch
       when: "'elasticsearch' in group_names"
@@ -27,11 +29,36 @@
         state: restarted
         enabled: yes
 
+    - name: Download http_ca.crt to the local Ansible controller
+      when: inventory_hostname == 'node1'
+      ansible.builtin.fetch:
+        src: /etc/elasticsearch/certs/http_ca.crt
+        dest: /tmp/fetched_certs/
+        flat: true
+
     - name: Install Kibana
       when: "'kibana' in group_names"
       ansible.builtin.yum:
         name: kibana
         state: present
+
+    - name: Create certs directory on Kibana host if missing
+      when: "'kibana' in group_names"
+      ansible.builtin.file:
+        path: "{{ kibana_cert_dir }}"
+        state: directory
+        owner: kibana
+        group: kibana
+        mode: '0750'
+
+    - name: Upload http_ca.crt from Ansible controller to Kibana host
+      when: "'kibana' in group_names"
+      ansible.builtin.copy:
+        src: /tmp/fetched_certs/http_ca.crt
+        dest: "{{ kibana_cert_dir }}/http_ca.crt"
+        owner: kibana
+        group: kibana
+        mode: '0640'
 
     - name: Deploy Kibana configuration
       when: "'kibana' in group_names"
