@@ -52,18 +52,21 @@
       when: "'kibana' in group_names"
 
     - name: Restart logstash
+      when: "'kibana' in group_names"
       ansible.builtin.systemd_service:
         name: logstash
         state: restarted
         enabled: true
 
     - name: Restart filebeat
+      when: "'kibana' in group_names"
       ansible.builtin.systemd_service:
         name: filebeat
         state: restarted
         enabled: true
 
     - name: Restart metricbeat
+      when: "'kibana' in group_names"
       ansible.builtin.systemd_service:
         name: metricbeat
         state: restarted
