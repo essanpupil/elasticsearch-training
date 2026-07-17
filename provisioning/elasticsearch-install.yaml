@@ -40,16 +40,6 @@
     #     dest: /tmp/fetched_certs/
     #     flat: true
 
-    - name: Set hardcoded password for kibana_system non-interactively
-      when: inventory_hostname == 'node1'
-      ansible.builtin.shell: |
-        set -o pipefail
-        printf "{{ shared_cluster_password }}!\n{{ shared_cluster_password }}!\n" | /usr/share/elasticsearch/bin/elasticsearch-reset-password -u kibana_system -b -i
-      args:
-        executable: /bin/bash
-      # no_log: true
-
-
     # - name: Create Elasticsearch keystore file if missing
     #   when: inventory_hostname == 'node1'
     #   ansible.builtin.command:
@@ -170,3 +160,12 @@
       service:
         name: elasticsearch
         state: restarted
+
+    - name: Set hardcoded password for kibana_system non-interactively
+      when: inventory_hostname == 'node1'
+      ansible.builtin.shell: |
+        set -o pipefail
+        printf "{{ shared_cluster_password }}!\n{{ shared_cluster_password }}!\n" | /usr/share/elasticsearch/bin/elasticsearch-reset-password -u kibana_system -b -i
+      args:
+        executable: /bin/bash
+      # no_log: true
