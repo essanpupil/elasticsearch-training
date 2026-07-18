@@ -11,46 +11,11 @@
         enablerepo: elasticsearch
 
     - name: Enable and start Elasticsearch service
+      when: config_file is changed
       ansible.builtin.systemd_service:
         name: elasticsearch
-        state: started
+        state: restarted
         enabled: yes
-
-    - name: Set keystore password to blank using stdin
-      ansible.builtin.command:
-        cmd: "{{ es_bin_dir }}/elasticsearch-keystore add -f -x xpack.security.transport.ssl.keystore.secure_password"
-        stdin: "\n"
-
-    - name: Set truststore password to blank using stdin
-      ansible.builtin.command:
-        cmd: "{{ es_bin_dir }}/elasticsearch-keystore add -f -x xpack.security.transport.ssl.truststore.secure_password"
-        stdin: "\n"
-
-    - name: Reset elastic password
-      # when: inventory_hostname == 'node1'
-      ansible.builtin.command:
-        cmd: "{{ es_bin_dir }}/elasticsearch-reset-password -u elastic -b -i"
-        stdin: "{{ elastic_password }}\n{{ elastic_password }}"
-      register: cli_output_elastic
-      changed_when: true
-
-    - name: Show CLI execution results
-      # when: inventory_hostname == 'node1'
-      ansible.builtin.debug:
-        var: cli_output_elastic.stdout_lines
-
-    - name: Reset kibana_system password
-      # when: inventory_hostname == 'node1'
-      ansible.builtin.command:
-        cmd: "{{ es_bin_dir }}/elasticsearch-reset-password -u kibana_system -b -i"
-        stdin: "{{ kibana_system_password }}\n{{ kibana_system_password }}"
-      register: cli_output
-      changed_when: true
-
-    - name: Show CLI execution results
-      # when: inventory_hostname == 'node1'
-      ansible.builtin.debug:
-        var: cli_output.stdout_lines
 
     - name: Delete certificates if exists
       ansible.builtin.file:
@@ -102,29 +67,6 @@
         group: elasticsearch
         mode: '0660'
 
-    # - name: Generate Instance YAML file for certutil
-    #   when: inventory_hostname == 'node1'
-    #   copy:
-    #     dest: /tmp/instances.yml
-    #     content: |
-    #       instances:
-    #         - name: "node1"
-    #           dns: [ "ip-10-0-3-88.us-east-2.compute.internal" ]
-    #           ip: [ "10.0.3.27" ]
-    #         - name: "node2"
-    #           dns: [ "ip-10-0-3-214.us-east-2.compute.internal" ]
-    #           ip: [ "10.0.3.214" ]
-    #         - name: "node3"
-    #           dns: [ "ip-10-0-3-200.us-east-2.compute.internal" ]
-    #           ip: [ "10.0.3.200" ]
-
-    # - name: Generate http cert
-    #   when: inventory_hostname == 'node1'
-    #   command: |
-    #     /usr/share/elasticsearch/bin/elasticsearch-certutil http --silent --in /tmp/instances.yml --out /tmp/es-certs.zip --self-signed --pass ""
-    #   args:
-    #     creates: /tmp/es-certs.zip
-
     - name: Deploy Elasticsearch configuration
       register: config_file
       ansible.builtin.template:
@@ -140,48 +82,3 @@
         name: elasticsearch
         state: restarted
         enabled: yes
-
-#     - name: Ensure target certs directory exists
-#       file:
-#         path: /etc/elasticsearch/certs
-#         state: directory
-#         owner: root
-#         group: elasticsearch
-#         mode: '0640'
-
-#     - name: Copy specific node certificate
-#       copy:
-#         src: "/tmp/fetched_certs/{{ inventory_hostname }}.p12"
-#         dest: "/etc/elasticsearch/certs/node.p12"
-#         owner: elasticsearch
-#         group: elasticsearch
-#         mode: '0640'
-
-#     # - name: Inject TLS configuration into elasticsearch.yml
-#     #   when: inventory_hostname != 'node1'
-#     #   blockinfile:
-#     #     path: /etc/elasticsearch/elasticsearch.yml
-#     #     marker: "# {mark} ANSIBLE MANAGED TLS CONFIG #"
-#     #     block: |
-#     #       xpack.security.transport.ssl.enabled: true
-#     #       xpack.security.transport.ssl.verification_mode: certificate
-#     #       xpack.security.transport.ssl.keystore.path: certs/node.p12
-#     #       xpack.security.transport.ssl.truststore.path: certs/node.p12
-
-#     #       xpack.security.http.ssl.enabled: true
-#     #       xpack.security.http.ssl.keystore.path: certs/node.p12
-#     #       xpack.security.http.ssl.truststore.path: certs/node.p12
-
-#     - name: Restart Elasticsearch
-#       service:
-#         name: elasticsearch
-#         state: restarted
-
-#     - name: Set hardcoded password for kibana_system non-interactively
-#       when: inventory_hostname == 'node1'
-#       ansible.builtin.shell: |
-#         set -o pipefail
-#         printf "{{ shared_cluster_password }}!\n{{ shared_cluster_password }}!\n" | /usr/share/elasticsearch/bin/elasticsearch-reset-password -u kibana_system -b -i
-#       args:
-#         executable: /bin/bash
-#       # no_log: true

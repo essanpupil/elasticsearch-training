@@ -26,7 +26,7 @@ node.name: {{ inventory_hostname }}
 #
 #node.attr.rack: r1
 #
-node.roles: [ master, data ]
+node.roles: [ master, data, ingest ]
 # ----------------------------------- Paths ------------------------------------
 #
 # Path to directory where to store the data (separate multiple locations by comma):
@@ -41,7 +41,7 @@ path.logs: /var/log/elasticsearch
 #
 # Lock the memory on startup:
 #
-#bootstrap.memory_lock: true
+bootstrap.memory_lock: true
 #
 # Make sure that the heap size is set to about half the memory available
 # on the system and that the owner of the process is allowed to use this
@@ -122,4 +122,5 @@ http.host: 0.0.0.0
 
 # Allow other nodes to join the cluster from anywhere
 # Connections are encrypted and mutually authenticated
-#transport.host: 0.0.0.0
+transport.host: 0.0.0.0
+transport.port: 9300
