@@ -181,3 +181,6 @@ pid.file: /run/kibana/kibana.pid
 # Maximum number of documents loaded by each shard to generate autocomplete suggestions.
 # This value must be a whole number greater than zero. Defaults to 100_000
 #unifiedSearch.autocomplete.valueSuggestions.terminateAfter: 100000
+
+# Encryption key to support alert
+xpack.encryptedSavedObjects.encryptionKey: {{ kibana_encryption_key }}
