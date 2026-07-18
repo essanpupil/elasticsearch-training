@@ -27,7 +27,7 @@
         stdin: "\n"
 
     - name: Reset elastic password
-      when: inventory_hostname == 'node1'
+      # when: inventory_hostname == 'node1'
       ansible.builtin.command:
         cmd: "{{ es_bin_dir }}/elasticsearch-reset-password -u elastic -b -i"
         stdin: "{{ elastic_password }}\n{{ elastic_password }}"
@@ -35,12 +35,12 @@
       changed_when: true
 
     - name: Show CLI execution results
-      when: inventory_hostname == 'node1'
+      # when: inventory_hostname == 'node1'
       ansible.builtin.debug:
         var: cli_output_elastic.stdout_lines
 
     - name: Reset kibana_system password
-      when: inventory_hostname == 'node1'
+      # when: inventory_hostname == 'node1'
       ansible.builtin.command:
         cmd: "{{ es_bin_dir }}/elasticsearch-reset-password -u kibana_system -b -i"
         stdin: "{{ kibana_system_password }}\n{{ kibana_system_password }}"
@@ -48,7 +48,7 @@
       changed_when: true
 
     - name: Show CLI execution results
-      when: inventory_hostname == 'node1'
+      # when: inventory_hostname == 'node1'
       ansible.builtin.debug:
         var: cli_output.stdout_lines
 
