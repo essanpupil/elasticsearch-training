@@ -3,34 +3,27 @@
   hosts: kibana
   gather_facts: true
   become: true
-  vars:
-    kibana_cert_dir: /etc/kibana/certs
-    shared_cluster_password: "SuperSecureClusterPassword2026!"
-    es_home: "/usr/share/elasticsearch"
-    es_config_dir: "/etc/elasticsearch"
-    kibana_home: "/usr/share/kibana"
-    kibana_config_dir: "/etc/kibana"
   tasks:
     - name: Install Kibana
       ansible.builtin.yum:
         name: kibana
         state: present
 
-    - name: Ensure Kibana certs directory exists
-      file:
-        path: /etc/kibana/certs
-        state: directory
-        owner: kibana
-        group: kibana
-        mode: '0750'
+    # - name: Ensure Kibana certs directory exists
+    #   file:
+    #     path: /etc/kibana/certs
+    #     state: directory
+    #     owner: kibana
+    #     group: kibana
+    #     mode: '0750'
 
-    - name: Push CA certificate to Kibana server
-      copy:
-        src: /tmp/fetched_certs/ca.crt
-        dest: /etc/kibana/certs/ca.crt
-        owner: kibana
-        group: kibana
-        mode: '0644'
+    # - name: Push CA certificate to Kibana server
+    #   copy:
+    #     src: /tmp/fetched_certs/ca.crt
+    #     dest: /etc/kibana/certs/ca.crt
+    #     owner: kibana
+    #     group: kibana
+    #     mode: '0644'
 
     - name: Deploy Kibana configuration
       ansible.builtin.template:
@@ -71,15 +64,15 @@
         state: restarted
         enabled: yes
 
-    - name: Install Logstash and Beats on Kibana group hosts
-      ansible.builtin.dnf:
-        name:
-          - logstash
-          - filebeat
-          - metricbeat
-        state: absent
-        update_cache: true
-      when: "'kibana' in group_names"
+    # - name: Install Logstash and Beats on Kibana group hosts
+    #   ansible.builtin.dnf:
+    #     name:
+    #       - logstash
+    #       - filebeat
+    #       - metricbeat
+    #     state: absent
+    #     update_cache: true
+    #   when: "'kibana' in group_names"
 
     # - name: Restart logstash
     #   when: "'kibana' in group_names"
