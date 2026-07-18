@@ -30,9 +30,9 @@ node.roles:
   - master
   - data
   - ingest
-  {% if inventory_hostname == 'node1' %}
+{% if inventory_hostname == 'node1' %}
   - remote_cluster_client
-  {% endif %}
+{% endif %}
 # ----------------------------------- Paths ------------------------------------
 #
 # Path to directory where to store the data (separate multiple locations by comma):
