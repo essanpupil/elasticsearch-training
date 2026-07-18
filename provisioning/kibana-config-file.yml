@@ -91,7 +91,7 @@ elasticsearch.password: "{{ kibana_system_password }}"
 #elasticsearch.ssl.certificateAuthorities: [ "/path/to/your/CA.pem" ]
 
 # To disregard the validity of SSL certificates, change this setting's value to 'none'.
-#elasticsearch.ssl.verificationMode: full
+elasticsearch.ssl.verificationMode: none
 
 # =================== System: Logging ===================
 # Set the value of this setting to off to suppress all logging output, or to debug to log everything. Defaults to 'info'
