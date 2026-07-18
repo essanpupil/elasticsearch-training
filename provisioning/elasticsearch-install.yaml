@@ -13,7 +13,7 @@
     - name: Deploy Elasticsearch configuration
       register: config_file
       ansible.builtin.template:
-        src: elasticsearch-config-file.yml
+        src: elasticsearch.yml.j2
         dest: /etc/elasticsearch/elasticsearch.yml
         owner: root
         group: elasticsearch
