@@ -78,6 +78,22 @@
         dest: /tmp/elastic-certificates.p12
         flat: true
 
+    - name: Copy CA certificate to all elasticsearch nodes
+      ansible.builtin.copy:
+        src: /tmp/elastic-stack-ca.p12
+        dest: /etc/elasticsearch/certs/elastic-stack-ca.p12
+        owner: root
+        group: elasticsearch
+        mode: '0660'
+
+    - name: Copy node certificate to all elasticsearch nodes
+      ansible.builtin.copy:
+        src: /tmp/elastic-certificates.p12
+        dest: /etc/elasticsearch/certs/elastic-certificates.p12
+        owner: root
+        group: elasticsearch
+        mode: '0660'
+
     - name: Generate Instance YAML file for certutil
       when: inventory_hostname == 'node1'
       copy:
