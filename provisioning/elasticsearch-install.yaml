@@ -45,7 +45,7 @@
     - name: Generate Certificate Authority
       when: inventory_hostname == 'node1'
       ansible.builtin.command:
-        cmd: "{{ es_bin_dir }}/elasticsearch-certutil ca --pass '' --out elastic-stack-ca.p12--silent"
+        cmd: "{{ es_bin_dir }}/elasticsearch-certutil ca --pass '' --out elastic-stack-ca.p12 --silent"
       changed_when: true
 
     - name: Generate TLS Certificate
