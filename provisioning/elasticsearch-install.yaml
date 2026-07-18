@@ -19,12 +19,23 @@
         group: elasticsearch
         mode: '0660'
 
-#     - name: Enable and start Elasticsearch service
-#       when: config_file is changed
-#       ansible.builtin.systemd_service:
-#         name: elasticsearch
-#         state: restarted
-#         enabled: yes
+    - name: Enable and start Elasticsearch service
+      when: config_file is changed
+      ansible.builtin.systemd_service:
+        name: elasticsearch
+        state: restarted
+        enabled: yes
+
+    - name: Reset kibana_system password
+      ansible.builtin.command:
+        cmd: "{{ es_bin_dir }}/elasticsearch-reset-password -u kibana_system -b -i"
+        stdin: "{{ kibana_new_password }}\n{{ kibana_new_password }}"
+      register: cli_output
+      changed_when: true
+
+    - name: Show CLI execution results
+      ansible.builtin.debug:
+        var: cli_output.stdout_lines
 
 #     # - name: Download http_ca.crt to the local Ansible controller
 #     #   when: inventory_hostname == 'node1'

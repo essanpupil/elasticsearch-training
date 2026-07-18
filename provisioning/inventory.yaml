@@ -1,5 +1,6 @@
 all:
   vars:
+    es_bin_dir: "/usr/share/elasticsearch/bin"
     kibana_system_password: "PlainSecureString54-."
   children:
     kibana:
