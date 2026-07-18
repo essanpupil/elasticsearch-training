@@ -4,6 +4,13 @@
   gather_facts: true
   become: true
   tasks:
+    - name: Delete elasticsearch config if exists [ONE TIME TASK]
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /ets/elasticsearch/elasticsearch.yml
+
     - name: Install Elasticsearch
       ansible.builtin.dnf:
         name: "elasticsearch"
