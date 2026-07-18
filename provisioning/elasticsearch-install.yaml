@@ -42,6 +42,14 @@
       ansible.builtin.debug:
         var: cli_output.stdout_lines
 
+    - name: Delete certificates if exists
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /usr/share/elasticsearch/elastic-stack-ca.p12
+        - /usr/share/elasticsearch/elastic-certificates.p12
+
     - name: Generate Certificate Authority
       when: inventory_hostname == 'node1'
       ansible.builtin.command:
