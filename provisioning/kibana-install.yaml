@@ -9,22 +9,6 @@
         name: kibana
         state: present
 
-    # - name: Ensure Kibana certs directory exists
-    #   file:
-    #     path: /etc/kibana/certs
-    #     state: directory
-    #     owner: kibana
-    #     group: kibana
-    #     mode: '0750'
-
-    # - name: Push CA certificate to Kibana server
-    #   copy:
-    #     src: /tmp/fetched_certs/ca.crt
-    #     dest: /etc/kibana/certs/ca.crt
-    #     owner: kibana
-    #     group: kibana
-    #     mode: '0644'
-
     - name: Deploy Kibana configuration
       ansible.builtin.template:
         src: kibana.yml.j2
@@ -33,64 +17,8 @@
         group: kibana
         mode: '0660'
 
-    # - name: Create Kibana keystore file if missing
-    #   ansible.builtin.command:
-    #     cmd: "{{ kibana_home }}/bin/kibana-keystore create"
-    #   args:
-    #     creates: "{{ kibana_config_dir }}/kibana.keystore"
-
-    # - name: Check existing Kibana keys to prevent redundant tasks
-    #   ansible.builtin.shell:
-    #     cmd: "{{ kibana_home }}/bin/kibana-keystore list"
-    #   register: kibana_keys_list
-    #   changed_when: false
-
-    # - name: Add elasticsearch.password to Kibana keystore
-    #   ansible.builtin.shell:
-    #     cmd: "echo '{{ shared_cluster_password }}' | {{ kibana_home }}/bin/kibana-keystore add elasticsearch.password --stdin --force"
-    #   when: "'elasticsearch.password' not in kibana_keys_list.stdout_lines"
-    #   # no_log: true
-
-    # - name: Restrict Kibana keystore file permissions
-    #   ansible.builtin.file:
-    #     path: "{{ kibana_config_dir }}/kibana.keystore"
-    #     owner: kibana
-    #     group: kibana
-    #     mode: '0660'
-
     - name: Start and enable Kibana service
       ansible.builtin.systemd_service:
         name: kibana
         state: restarted
         enabled: yes
-
-    # - name: Install Logstash and Beats on Kibana group hosts
-    #   ansible.builtin.dnf:
-    #     name:
-    #       - logstash
-    #       - filebeat
-    #       - metricbeat
-    #     state: absent
-    #     update_cache: true
-    #   when: "'kibana' in group_names"
-
-    # - name: Restart logstash
-    #   when: "'kibana' in group_names"
-    #   ansible.builtin.systemd_service:
-    #     name: logstash
-    #     state: restarted
-    #     enabled: true
-
-    # - name: Restart filebeat
-    #   when: "'kibana' in group_names"
-    #   ansible.builtin.systemd_service:
-    #     name: filebeat
-    #     state: restarted
-    #     enabled: true
-
-    # - name: Restart metricbeat
-    #   when: "'kibana' in group_names"
-    #   ansible.builtin.systemd_service:
-    #     name: metricbeat
-    #     state: restarted
-    #     enabled: true
