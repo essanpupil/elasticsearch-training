@@ -1,6 +1,7 @@
 all:
   vars:
     es_bin_dir: "/usr/share/elasticsearch/bin"
+    es_config_dir: "/etc/elasticsearch"
     elastic_password: "PlainUnsecurePasswd90-/."
     kibana_system_password: "PlainSecureString54-."
     kibana_encryption_key: "6MMj3wv3+A2bvIk+9BUhJ0s0OpZq7Jaq"

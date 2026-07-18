@@ -27,6 +27,7 @@
         enabled: yes
 
     - name: Reset elastic password
+      when: inventory_hostname == 'node1'
       ansible.builtin.command:
         cmd: "{{ es_bin_dir }}/elasticsearch-reset-password -u elastic -b -i"
         stdin: "{{ elastic_password }}\n{{ elastic_password }}"
@@ -34,10 +35,12 @@
       changed_when: true
 
     - name: Show CLI execution results
+      when: inventory_hostname == 'node1'
       ansible.builtin.debug:
         var: cli_output_elastic.stdout_lines
 
     - name: Reset kibana_system password
+      when: inventory_hostname == 'node1'
       ansible.builtin.command:
         cmd: "{{ es_bin_dir }}/elasticsearch-reset-password -u kibana_system -b -i"
         stdin: "{{ kibana_system_password }}\n{{ kibana_system_password }}"
@@ -45,106 +48,58 @@
       changed_when: true
 
     - name: Show CLI execution results
+      when: inventory_hostname == 'node1'
       ansible.builtin.debug:
         var: cli_output.stdout_lines
 
-#     # - name: Download http_ca.crt to the local Ansible controller
-#     #   when: inventory_hostname == 'node1'
-#     #   ansible.builtin.fetch:
-#     #     src: /etc/elasticsearch/certs/http_ca.crt
-#     #     dest: /tmp/fetched_certs/
-#     #     flat: true
+    - name: Generate Certificate Authority
+      when: inventory_hostname == 'node1'
+      ansible.builtin.command:
+        cmd: "{{ es_bin_dir }}/elasticsearch-certutil ca --pass '' --silent"
+      changed_when: true
 
-#     # - name: Create Elasticsearch keystore file if missing
-#     #   when: inventory_hostname == 'node1'
-#     #   ansible.builtin.command:
-#     #     cmd: "{{ es_home }}/bin/elasticsearch-keystore create"
-#     #   args:
-#     #     creates: "{{ es_config_dir }}/elasticsearch.keystore"
+    - name: Generate TLS Certificate
+      when: inventory_hostname == 'node1'
+      ansible.builtin.command:
+        cmd: "{{ es_bin_dir }}/elasticsearch-certutil cert --ca elastic-stack-ca.p12 --pass '' --silent"
+      changed_when: true
 
-#     # - name: Add bootstrap.password to Elasticsearch keystore
-#     #   when: inventory_hostname == 'node1'
-#     #   ansible.builtin.command:
-#     #     cmd: "{{ es_home }}/bin/elasticsearch-keystore add -xf bootstrap.password"
-#     #   args:
-#     #     stdin: "{{ shared_cluster_password }}"
-#     #   # no_log: true
-#     #   register: es_secret_cmd
-#     #   changed_when: "'already exists' not in es_secret_cmd.stdout"
+    - name: Fetch CA certificate
+      when: inventory_hostname == 'node1'
+      fetch:
+        src: "/usr/share/elasticsearch/elastic-stack-ca.p12"
+        dest: /tmp/elastic-stack-ca.p12
+        flat: true
 
-#     # - name: Restrict Elasticsearch keystore file permissions
-#     #   when: inventory_hostname == 'node1'
-#     #   ansible.builtin.file:
-#     #     path: "{{ es_config_dir }}/elasticsearch.keystore"
-#     #     owner: root
-#     #     group: elasticsearch
-#     #     mode: '0660'
+    - name: Fetch node certificate
+      when: inventory_hostname == 'node1'
+      fetch:
+        src: "/usr/share/elasticsearch/elastic-certificates.p12"
+        dest: /tmp/elastic-certificates.p12
+        flat: true
 
-#     - name: Create certs directory
-#       file:
-#         path: /usr/share/elasticsearch/config/certs
-#         state: directory
-#         owner: elasticsearch
-#         group: elasticsearch
-#         mode: '0750'
+    - name: Generate Instance YAML file for certutil
+      when: inventory_hostname == 'node1'
+      copy:
+        dest: /tmp/instances.yml
+        content: |
+          instances:
+            - name: "node1"
+              dns: [ "ip-10-0-3-88.us-east-2.compute.internal" ]
+              ip: [ "10.0.3.27" ]
+            - name: "node2"
+              dns: [ "ip-10-0-3-214.us-east-2.compute.internal" ]
+              ip: [ "10.0.3.214" ]
+            - name: "node3"
+              dns: [ "ip-10-0-3-200.us-east-2.compute.internal" ]
+              ip: [ "10.0.3.200" ]
 
-#     - name: Generate Instance YAML file for certutil
-#       when: inventory_hostname == 'node1'
-#       copy:
-#         dest: /tmp/instances.yml
-#         content: |
-#           instances:
-#             - name: "node1"
-#               dns: [ "ip-10-0-3-27.us-east-2.compute.internal" ]
-#               ip: [ "10.0.3.27" ]
-#             - name: "node2"
-#               dns: [ "ip-10-0-3-214.us-east-2.compute.internal" ]
-#               ip: [ "10.0.3.214" ]
-#             - name: "node3"
-#               dns: [ "ip-10-0-3-200.us-east-2.compute.internal" ]
-#               ip: [ "10.0.3.200" ]
-
-#     - name: Clean up old corrupted certs and files
-#       file:
-#         path: "{{ item }}"
-#         state: absent
-#       loop:
-#         - /tmp/certs.zip
-#         - /tmp/ca
-#         - /tmp/node1
-#         - /tmp/node2
-#         - /tmp/node3
-
-#     - name: Generate CA and Node Certs zip archive
-#       when: inventory_hostname == 'node1'
-#       command: |
-#         /usr/share/elasticsearch/bin/elasticsearch-certutil cert --silent --in /tmp/instances.yml --out /tmp/es-certs.zip --self-signed --pass ""
-#       args:
-#         creates: /tmp/es-certs.zip
-
-#     - name: Extract certificates package using system unzip
-#       when: inventory_hostname == 'node1'
-#       command: unzip -o /tmp/es-certs.zip -d /tmp/
-#       args:
-#         creates: /tmp/ca/ca.crt
-
-#     - name: Fetch certificates to Ansible controller lake
-#       when: inventory_hostname == 'node1'
-#       fetch:
-#         src: "/tmp/{{ item }}/{{ item }}.p12"
-#         dest: "/tmp/fetched_certs/{{ item }}.p12"
-#         flat: true
-#       loop:
-#         - node1
-#         - node2
-#         - node3
-
-#     # - name: Fetch CA certificate specifically
-#     #   when: inventory_hostname == 'node1'
-#     #   fetch:
-#     #     src: /tmp/ca/ca.crt
-#     #     dest: /tmp/fetched_certs/ca.crt
-#     #     flat: true
+    - name: Generate http cert
+      when: inventory_hostname == 'node1'
+      command: |
+        /usr/share/elasticsearch/bin/elasticsearch-certutil http --silent --in /tmp/instances.yml --out /tmp/es-certs.zip --self-signed --pass ""
+      args:
+        creates: /tmp/es-certs.zip
 
 #     - name: Ensure target certs directory exists
 #       file:
