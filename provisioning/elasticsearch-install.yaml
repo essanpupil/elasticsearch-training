@@ -10,19 +10,20 @@
         state: present
         enablerepo: elasticsearch
 
-    - name: Enable and start Elasticsearch service
-      ansible.builtin.systemd_service:
-        name: elasticsearch
-        state: restarted
-        enabled: yes
+    - name: Get current timestamp
+      setup:
+        filter: ansible_date_time
 
-    - name: Delete certificates if exists
-      ansible.builtin.file:
-        path: "{{ item }}"
-        state: absent
+    - name: Backup existing certificates by renaming them
+      ansible.builtin.shell: |
+        if [ -f "{{ item }}" ]; then
+          mv "{{ item }}" "{{ item }}_{{ ansible_date_time.iso8601_basic_short }}"
+        fi
       loop:
         - /usr/share/elasticsearch/elastic-stack-ca.p12
         - /usr/share/elasticsearch/elastic-certificates.p12
+      register: rename_result
+      changed_when: "rename_result.rc == 0"
 
     - name: Generate Certificate Authority
       when: inventory_hostname == 'node1'
@@ -65,19 +66,3 @@
         owner: root
         group: elasticsearch
         mode: '0660'
-
-    - name: Deploy Elasticsearch configuration
-      register: config_file
-      ansible.builtin.template:
-        src: elasticsearch.yml.j2
-        dest: /etc/elasticsearch/elasticsearch.yml
-        owner: root
-        group: elasticsearch
-        mode: '0660'
-
-    - name: Enable and start Elasticsearch service
-      when: config_file is changed
-      ansible.builtin.systemd_service:
-        name: elasticsearch
-        state: restarted
-        enabled: yes
