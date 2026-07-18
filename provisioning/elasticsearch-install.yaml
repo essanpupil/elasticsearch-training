@@ -29,7 +29,7 @@
     - name: Reset kibana_system password
       ansible.builtin.command:
         cmd: "{{ es_bin_dir }}/elasticsearch-reset-password -u kibana_system -b -i"
-        stdin: "{{ kibana_new_password }}\n{{ kibana_new_password }}"
+        stdin: "{{ kibana_system_password }}\n{{ kibana_system_password }}"
       register: cli_output
       changed_when: true
 
