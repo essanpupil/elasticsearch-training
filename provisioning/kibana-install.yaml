@@ -27,7 +27,7 @@
 
     - name: Deploy Kibana configuration
       ansible.builtin.template:
-        src: kibana-config-file.yml
+        src: kibana.yml.j2
         dest: /etc/kibana/kibana.yml
         owner: root
         group: kibana
