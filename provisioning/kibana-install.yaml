@@ -9,6 +9,28 @@
         name: kibana
         state: present
 
+    - name: Start and enable Kibana service
+      ansible.builtin.systemd_service:
+        name: kibana
+        state: started
+        enabled: yes
+
+    - name: Check if elasticsearch.password exists in Kibana keystore
+      ansible.builtin.command:
+        cmd: /usr/share/kibana/bin/kibana-keystore list
+      register: keystore_list
+      changed_when: false
+
+    - name: Remove old password from keystore if it exists
+      ansible.builtin.command:
+        cmd: /usr/share/kibana/bin/kibana-keystore remove elasticsearch.password
+      when: "'elasticsearch.password' in keystore_list.stdout"
+
+    - name: Add new password to Kibana secure keystore
+      ansible.builtin.shell:
+        cmd: echo "{{ kibana_system_password }}" | /usr/share/kibana/bin/kibana-keystore add elasticsearch.password --stdin
+      no_log: true
+
     - name: Deploy Kibana configuration
       ansible.builtin.template:
         src: kibana.yml.j2
