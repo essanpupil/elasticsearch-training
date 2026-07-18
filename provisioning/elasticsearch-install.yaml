@@ -84,28 +84,28 @@
         group: elasticsearch
         mode: '0660'
 
-    - name: Generate Instance YAML file for certutil
-      when: inventory_hostname == 'node1'
-      copy:
-        dest: /tmp/instances.yml
-        content: |
-          instances:
-            - name: "node1"
-              dns: [ "ip-10-0-3-88.us-east-2.compute.internal" ]
-              ip: [ "10.0.3.27" ]
-            - name: "node2"
-              dns: [ "ip-10-0-3-214.us-east-2.compute.internal" ]
-              ip: [ "10.0.3.214" ]
-            - name: "node3"
-              dns: [ "ip-10-0-3-200.us-east-2.compute.internal" ]
-              ip: [ "10.0.3.200" ]
+    # - name: Generate Instance YAML file for certutil
+    #   when: inventory_hostname == 'node1'
+    #   copy:
+    #     dest: /tmp/instances.yml
+    #     content: |
+    #       instances:
+    #         - name: "node1"
+    #           dns: [ "ip-10-0-3-88.us-east-2.compute.internal" ]
+    #           ip: [ "10.0.3.27" ]
+    #         - name: "node2"
+    #           dns: [ "ip-10-0-3-214.us-east-2.compute.internal" ]
+    #           ip: [ "10.0.3.214" ]
+    #         - name: "node3"
+    #           dns: [ "ip-10-0-3-200.us-east-2.compute.internal" ]
+    #           ip: [ "10.0.3.200" ]
 
-    - name: Generate http cert
-      when: inventory_hostname == 'node1'
-      command: |
-        /usr/share/elasticsearch/bin/elasticsearch-certutil http --silent --in /tmp/instances.yml --out /tmp/es-certs.zip --self-signed --pass ""
-      args:
-        creates: /tmp/es-certs.zip
+    # - name: Generate http cert
+    #   when: inventory_hostname == 'node1'
+    #   command: |
+    #     /usr/share/elasticsearch/bin/elasticsearch-certutil http --silent --in /tmp/instances.yml --out /tmp/es-certs.zip --self-signed --pass ""
+    #   args:
+    #     creates: /tmp/es-certs.zip
 
     - name: Deploy Elasticsearch configuration
       register: config_file
