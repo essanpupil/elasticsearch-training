@@ -3,13 +3,6 @@
   hosts: elasticsearch
   gather_facts: true
   become: true
-  vars:
-    kibana_cert_dir: /etc/kibana/certs
-    shared_cluster_password: "SuperSecureClusterPassword2026!"
-    es_home: "/usr/share/elasticsearch"
-    es_config_dir: "/etc/elasticsearch"
-    kibana_home: "/usr/share/kibana"
-    kibana_config_dir: "/etc/kibana"
   tasks:
     - name: Install Elasticsearch
       ansible.builtin.dnf:
@@ -17,161 +10,161 @@
         state: present
         enablerepo: elasticsearch
 
-    - name: Deploy Elasticsearch configuration
-      register: config_file
-      ansible.builtin.template:
-        src: elasticsearch.yml
-        dest: /etc/elasticsearch/elasticsearch.yml
-        owner: root
-        group: elasticsearch
-        mode: '0660'
+#     - name: Deploy Elasticsearch configuration
+#       register: config_file
+#       ansible.builtin.template:
+#         src: elasticsearch.yml
+#         dest: /etc/elasticsearch/elasticsearch.yml
+#         owner: root
+#         group: elasticsearch
+#         mode: '0660'
 
-    - name: Enable and start Elasticsearch service
-      when: config_file is changed
-      ansible.builtin.systemd_service:
-        name: elasticsearch
-        state: restarted
-        enabled: yes
+#     - name: Enable and start Elasticsearch service
+#       when: config_file is changed
+#       ansible.builtin.systemd_service:
+#         name: elasticsearch
+#         state: restarted
+#         enabled: yes
 
-    # - name: Download http_ca.crt to the local Ansible controller
-    #   when: inventory_hostname == 'node1'
-    #   ansible.builtin.fetch:
-    #     src: /etc/elasticsearch/certs/http_ca.crt
-    #     dest: /tmp/fetched_certs/
-    #     flat: true
+#     # - name: Download http_ca.crt to the local Ansible controller
+#     #   when: inventory_hostname == 'node1'
+#     #   ansible.builtin.fetch:
+#     #     src: /etc/elasticsearch/certs/http_ca.crt
+#     #     dest: /tmp/fetched_certs/
+#     #     flat: true
 
-    # - name: Create Elasticsearch keystore file if missing
-    #   when: inventory_hostname == 'node1'
-    #   ansible.builtin.command:
-    #     cmd: "{{ es_home }}/bin/elasticsearch-keystore create"
-    #   args:
-    #     creates: "{{ es_config_dir }}/elasticsearch.keystore"
+#     # - name: Create Elasticsearch keystore file if missing
+#     #   when: inventory_hostname == 'node1'
+#     #   ansible.builtin.command:
+#     #     cmd: "{{ es_home }}/bin/elasticsearch-keystore create"
+#     #   args:
+#     #     creates: "{{ es_config_dir }}/elasticsearch.keystore"
 
-    # - name: Add bootstrap.password to Elasticsearch keystore
-    #   when: inventory_hostname == 'node1'
-    #   ansible.builtin.command:
-    #     cmd: "{{ es_home }}/bin/elasticsearch-keystore add -xf bootstrap.password"
-    #   args:
-    #     stdin: "{{ shared_cluster_password }}"
-    #   # no_log: true
-    #   register: es_secret_cmd
-    #   changed_when: "'already exists' not in es_secret_cmd.stdout"
+#     # - name: Add bootstrap.password to Elasticsearch keystore
+#     #   when: inventory_hostname == 'node1'
+#     #   ansible.builtin.command:
+#     #     cmd: "{{ es_home }}/bin/elasticsearch-keystore add -xf bootstrap.password"
+#     #   args:
+#     #     stdin: "{{ shared_cluster_password }}"
+#     #   # no_log: true
+#     #   register: es_secret_cmd
+#     #   changed_when: "'already exists' not in es_secret_cmd.stdout"
 
-    # - name: Restrict Elasticsearch keystore file permissions
-    #   when: inventory_hostname == 'node1'
-    #   ansible.builtin.file:
-    #     path: "{{ es_config_dir }}/elasticsearch.keystore"
-    #     owner: root
-    #     group: elasticsearch
-    #     mode: '0660'
+#     # - name: Restrict Elasticsearch keystore file permissions
+#     #   when: inventory_hostname == 'node1'
+#     #   ansible.builtin.file:
+#     #     path: "{{ es_config_dir }}/elasticsearch.keystore"
+#     #     owner: root
+#     #     group: elasticsearch
+#     #     mode: '0660'
 
-    - name: Create certs directory
-      file:
-        path: /usr/share/elasticsearch/config/certs
-        state: directory
-        owner: elasticsearch
-        group: elasticsearch
-        mode: '0750'
+#     - name: Create certs directory
+#       file:
+#         path: /usr/share/elasticsearch/config/certs
+#         state: directory
+#         owner: elasticsearch
+#         group: elasticsearch
+#         mode: '0750'
 
-    - name: Generate Instance YAML file for certutil
-      when: inventory_hostname == 'node1'
-      copy:
-        dest: /tmp/instances.yml
-        content: |
-          instances:
-            - name: "node1"
-              dns: [ "ip-10-0-3-27.us-east-2.compute.internal" ]
-              ip: [ "10.0.3.27" ]
-            - name: "node2"
-              dns: [ "ip-10-0-3-214.us-east-2.compute.internal" ]
-              ip: [ "10.0.3.214" ]
-            - name: "node3"
-              dns: [ "ip-10-0-3-200.us-east-2.compute.internal" ]
-              ip: [ "10.0.3.200" ]
+#     - name: Generate Instance YAML file for certutil
+#       when: inventory_hostname == 'node1'
+#       copy:
+#         dest: /tmp/instances.yml
+#         content: |
+#           instances:
+#             - name: "node1"
+#               dns: [ "ip-10-0-3-27.us-east-2.compute.internal" ]
+#               ip: [ "10.0.3.27" ]
+#             - name: "node2"
+#               dns: [ "ip-10-0-3-214.us-east-2.compute.internal" ]
+#               ip: [ "10.0.3.214" ]
+#             - name: "node3"
+#               dns: [ "ip-10-0-3-200.us-east-2.compute.internal" ]
+#               ip: [ "10.0.3.200" ]
 
-    - name: Clean up old corrupted certs and files
-      file:
-        path: "{{ item }}"
-        state: absent
-      loop:
-        - /tmp/certs.zip
-        - /tmp/ca
-        - /tmp/node1
-        - /tmp/node2
-        - /tmp/node3
+#     - name: Clean up old corrupted certs and files
+#       file:
+#         path: "{{ item }}"
+#         state: absent
+#       loop:
+#         - /tmp/certs.zip
+#         - /tmp/ca
+#         - /tmp/node1
+#         - /tmp/node2
+#         - /tmp/node3
 
-    - name: Generate CA and Node Certs zip archive
-      when: inventory_hostname == 'node1'
-      command: |
-        /usr/share/elasticsearch/bin/elasticsearch-certutil cert --silent --in /tmp/instances.yml --out /tmp/es-certs.zip --self-signed --pass ""
-      args:
-        creates: /tmp/es-certs.zip
+#     - name: Generate CA and Node Certs zip archive
+#       when: inventory_hostname == 'node1'
+#       command: |
+#         /usr/share/elasticsearch/bin/elasticsearch-certutil cert --silent --in /tmp/instances.yml --out /tmp/es-certs.zip --self-signed --pass ""
+#       args:
+#         creates: /tmp/es-certs.zip
 
-    - name: Extract certificates package using system unzip
-      when: inventory_hostname == 'node1'
-      command: unzip -o /tmp/es-certs.zip -d /tmp/
-      args:
-        creates: /tmp/ca/ca.crt
+#     - name: Extract certificates package using system unzip
+#       when: inventory_hostname == 'node1'
+#       command: unzip -o /tmp/es-certs.zip -d /tmp/
+#       args:
+#         creates: /tmp/ca/ca.crt
 
-    - name: Fetch certificates to Ansible controller lake
-      when: inventory_hostname == 'node1'
-      fetch:
-        src: "/tmp/{{ item }}/{{ item }}.p12"
-        dest: "/tmp/fetched_certs/{{ item }}.p12"
-        flat: true
-      loop:
-        - node1
-        - node2
-        - node3
+#     - name: Fetch certificates to Ansible controller lake
+#       when: inventory_hostname == 'node1'
+#       fetch:
+#         src: "/tmp/{{ item }}/{{ item }}.p12"
+#         dest: "/tmp/fetched_certs/{{ item }}.p12"
+#         flat: true
+#       loop:
+#         - node1
+#         - node2
+#         - node3
 
-    # - name: Fetch CA certificate specifically
-    #   when: inventory_hostname == 'node1'
-    #   fetch:
-    #     src: /tmp/ca/ca.crt
-    #     dest: /tmp/fetched_certs/ca.crt
-    #     flat: true
+#     # - name: Fetch CA certificate specifically
+#     #   when: inventory_hostname == 'node1'
+#     #   fetch:
+#     #     src: /tmp/ca/ca.crt
+#     #     dest: /tmp/fetched_certs/ca.crt
+#     #     flat: true
 
-    - name: Ensure target certs directory exists
-      file:
-        path: /etc/elasticsearch/certs
-        state: directory
-        owner: root
-        group: elasticsearch
-        mode: '0640'
+#     - name: Ensure target certs directory exists
+#       file:
+#         path: /etc/elasticsearch/certs
+#         state: directory
+#         owner: root
+#         group: elasticsearch
+#         mode: '0640'
 
-    - name: Copy specific node certificate
-      copy:
-        src: "/tmp/fetched_certs/{{ inventory_hostname }}.p12"
-        dest: "/etc/elasticsearch/certs/node.p12"
-        owner: elasticsearch
-        group: elasticsearch
-        mode: '0640'
+#     - name: Copy specific node certificate
+#       copy:
+#         src: "/tmp/fetched_certs/{{ inventory_hostname }}.p12"
+#         dest: "/etc/elasticsearch/certs/node.p12"
+#         owner: elasticsearch
+#         group: elasticsearch
+#         mode: '0640'
 
-    # - name: Inject TLS configuration into elasticsearch.yml
-    #   when: inventory_hostname != 'node1'
-    #   blockinfile:
-    #     path: /etc/elasticsearch/elasticsearch.yml
-    #     marker: "# {mark} ANSIBLE MANAGED TLS CONFIG #"
-    #     block: |
-    #       xpack.security.transport.ssl.enabled: true
-    #       xpack.security.transport.ssl.verification_mode: certificate
-    #       xpack.security.transport.ssl.keystore.path: certs/node.p12
-    #       xpack.security.transport.ssl.truststore.path: certs/node.p12
+#     # - name: Inject TLS configuration into elasticsearch.yml
+#     #   when: inventory_hostname != 'node1'
+#     #   blockinfile:
+#     #     path: /etc/elasticsearch/elasticsearch.yml
+#     #     marker: "# {mark} ANSIBLE MANAGED TLS CONFIG #"
+#     #     block: |
+#     #       xpack.security.transport.ssl.enabled: true
+#     #       xpack.security.transport.ssl.verification_mode: certificate
+#     #       xpack.security.transport.ssl.keystore.path: certs/node.p12
+#     #       xpack.security.transport.ssl.truststore.path: certs/node.p12
 
-    #       xpack.security.http.ssl.enabled: true
-    #       xpack.security.http.ssl.keystore.path: certs/node.p12
-    #       xpack.security.http.ssl.truststore.path: certs/node.p12
+#     #       xpack.security.http.ssl.enabled: true
+#     #       xpack.security.http.ssl.keystore.path: certs/node.p12
+#     #       xpack.security.http.ssl.truststore.path: certs/node.p12
 
-    - name: Restart Elasticsearch
-      service:
-        name: elasticsearch
-        state: restarted
+#     - name: Restart Elasticsearch
+#       service:
+#         name: elasticsearch
+#         state: restarted
 
-    - name: Set hardcoded password for kibana_system non-interactively
-      when: inventory_hostname == 'node1'
-      ansible.builtin.shell: |
-        set -o pipefail
-        printf "{{ shared_cluster_password }}!\n{{ shared_cluster_password }}!\n" | /usr/share/elasticsearch/bin/elasticsearch-reset-password -u kibana_system -b -i
-      args:
-        executable: /bin/bash
-      # no_log: true
+#     - name: Set hardcoded password for kibana_system non-interactively
+#       when: inventory_hostname == 'node1'
+#       ansible.builtin.shell: |
+#         set -o pipefail
+#         printf "{{ shared_cluster_password }}!\n{{ shared_cluster_password }}!\n" | /usr/share/elasticsearch/bin/elasticsearch-reset-password -u kibana_system -b -i
+#       args:
+#         executable: /bin/bash
+#       # no_log: true
