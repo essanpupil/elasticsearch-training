@@ -1,11 +1,6 @@
 all:
   vars:
-    kibana_cert_dir: /etc/kibana/certs
-    shared_cluster_password: "SuperSecureClusterPassword2026!"
-    es_home: "/usr/share/elasticsearch"
-    es_config_dir: "/etc/elasticsearch"
-    kibana_home: "/usr/share/kibana"
-    kibana_config_dir: "/etc/kibana"
+    kibana_system_password: "PlainSecureString54-."
   children:
     kibana:
       hosts:
