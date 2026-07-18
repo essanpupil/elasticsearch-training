@@ -29,7 +29,7 @@
     - name: Reset elastic password
       ansible.builtin.command:
         cmd: "{{ es_bin_dir }}/elasticsearch-reset-password -u elastic -b -i"
-        stdin: "{{ elastic_system_password }}\n{{ elastic_system_password }}"
+        stdin: "{{ elastic_password }}\n{{ elastic_password }}"
       register: cli_output_elastic
       changed_when: true
 
