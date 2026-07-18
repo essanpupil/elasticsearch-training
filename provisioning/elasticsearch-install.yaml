@@ -4,13 +4,6 @@
   gather_facts: true
   become: true
   tasks:
-    - name: Delete elasticsearch config if exists [ONE TIME TASK]
-      ansible.builtin.file:
-        path: "{{ item }}"
-        state: absent
-      loop:
-        - /ets/elasticsearch/elasticsearch.yml
-
     - name: Install Elasticsearch
       ansible.builtin.dnf:
         name: "elasticsearch"
@@ -18,7 +11,6 @@
         enablerepo: elasticsearch
 
     - name: Enable and start Elasticsearch service
-      when: config_file is changed
       ansible.builtin.systemd_service:
         name: elasticsearch
         state: restarted
