@@ -26,7 +26,13 @@ node.name: {{ inventory_hostname }}
 #
 #node.attr.rack: r1
 #
-node.roles: [ master, data, ingest ]
+node.roles:
+  - master
+  - data
+  - ingest
+  {% if inventory_hostname == 'node1' %}
+    - remote_cluster_client
+  {% endif %}
 # ----------------------------------- Paths ------------------------------------
 #
 # Path to directory where to store the data (separate multiple locations by comma):
