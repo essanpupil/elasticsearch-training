@@ -49,8 +49,8 @@ resource "aws_iam_instance_profile" "kibana" {
 }
 
 resource "aws_instance" "kibana" {
-  ami                  = "ami-06fa3e561475dbbb4"
-  instance_type        = "t4g.small"
+  ami                  = "ami-0e68dc81dc36750a1"
+  instance_type        = "t3.small"
   subnet_id            = data.terraform_remote_state.vpc.outputs.private_subnet_id
   iam_instance_profile = aws_iam_instance_profile.kibana.id
   vpc_security_group_ids = [

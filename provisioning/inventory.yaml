@@ -1,38 +1,34 @@
 all:
   vars:
-    es_bin_dir: "/usr/share/elasticsearch/bin"
-    es_config_dir: "/etc/elasticsearch"
-    elastic_password: "PlainUnsecurePasswd90-/."
-    kibana_system_password: "*W2h3gHEW46Zr_aCq=C="
+    elasticsearch_cluster_name: observability
+    elasticsearch_elastic_password: v7YXq2WOlP3J9LXuXLbA
     kibana_object_key: 6e15a830e2bbda9cb530c5eed71ae518caecc11f016f8be2de5e30df5a766e30
     kibana_reporting_key: 126b030b54d221a0247878c67c1cec724e3ffc4afbc6fbd58fa63d0ebc8c4bfa
     kibana_security_key: 928737613e9156e1b7a3bfc03d6213282956518fa8839d79b57c8aeef283b70a
-    elasticsearch_cluster_name: observability
   children:
-    kibana:
-      hosts:
-        server1:
-          ansible_host: 10.0.2.120
-          ansible_user: ec2-user
-          ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
-          ansible_python_interpreter: /usr/bin/python3.9
-    elasticsearch:
-      hosts:
-        node1:
-          ansible_host: 10.0.3.56
-          instance_dns: ip-10-0-3-56.us-east-2.compute.internal
-          ansible_user: ec2-user
-          ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
-          ansible_python_interpreter: /usr/bin/python3.9
-        node2:
-          ansible_host: 10.0.3.21
-          instance_dns: ip-10-0-3-21.us-east-2.compute.internal
-          ansible_user: ec2-user
-          ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
-          ansible_python_interpreter: /usr/bin/python3.9
-        node3:
-          ansible_host: 10.0.3.86
-          instance_dns: ip-10-0-3-86.us-east-2.compute.internal
-          ansible_user: ec2-user
-          ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
-          ansible_python_interpreter: /usr/bin/python3.9
+    elastic_stack:
+      vars:
+        ansible_user: admin
+        ansible_port: 22
+        ansible_ssh_common_args: "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PasswordAuthentication=no -o IdentitiesOnly=yes -o LogLevel=FATAL -o PubkeyAcceptedKeyTypes=+ssh-rsa -o HostKeyAlgorithms=+ssh-rsa"
+        ansible_python_interpreter: /usr/bin/python3.13
+      children:
+        es-initial:
+          hosts:
+            node1:
+              ansible_host: 10.0.3.210
+        es-join:
+          hosts:
+            node2:
+              ansible_host: 10.0.3.85
+            node3:
+              ansible_host: 10.0.3.232
+        ingerster:
+          hosts:
+            logstash:
+              ansible_host: 192.168.33.54
+        webui:
+          hosts:
+            kibana:
+              ansible_host: 10.0.2.127
+              ansible_port: 22
