@@ -30,3 +30,8 @@
     - name: Refresh apt cache with new repository
       ansible.builtin.apt:
         update_cache: yes
+    
+    - name: Install required package
+      ansible.builtin.apt:
+        name: python3-pexpect
+
