@@ -18,6 +18,7 @@
         mode: '0660'
 
     - name: Ensure Elasticsearch service is enabled and started
+      when: inventory_hostname == 'node1'
       ansible.builtin.systemd:
         name: elasticsearch
         state: started
@@ -33,8 +34,6 @@
         /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s node --url https://{{ ansible_host }}:9200
       register: token_output
       changed_when: false
-    - debug:
-        msg: "{{ token_output }}"
 
     - name: Run Elasticsearch reconfigure utility using enrollment token
       when: inventory_hostname != 'node1'
@@ -42,15 +41,18 @@
         /usr/share/elasticsearch/bin/elasticsearch-reconfigure-node --enrollment-token {{ hostvars['node1']['token_output']['stdout'] | trim }}
       args:
         creates: /etc/elasticsearch/certs/transport.p12
-      register: "{{ join_output }"
-    - debug:
-        msg: join_output
+      register: join_output
 
-    # - name: Ensure Elasticsearch service is enabled and started
-    #   ansible.builtin.systemd:
-    #     name: elasticsearch
-    #     state: started
-    #     enabled: true
+    - name: debug join 
+      when: inventory_hostname != 'node1'
+      debug:
+        msg: "{{ join_output }}"
+
+    - name: Ensure Elasticsearch service is enabled and started
+      ansible.builtin.systemd:
+        name: elasticsearch
+        state: started
+        enabled: true
 
     - name: Wait for 10 seconds for nodes to completely settle down
       ansible.builtin.pause:

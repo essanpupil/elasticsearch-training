@@ -7,6 +7,7 @@ all:
     kibana_encryption_key: "6MMj3wv3+A2bvIk+9BUhJ0s0OpZq7Jaq"
     kibana_reporting_key: bb66a11669aea3a038b440611f9b26649d23d76ad513210a94e5cfe644a1c5a0
     kibana_security_key: 4c07ee984d40d1392363ff74c7ef48d97565f541d8ab6d7c77e29aa9d2448f30
+    elasticsearch_cluster_name: observability
   children:
     kibana:
       hosts:
