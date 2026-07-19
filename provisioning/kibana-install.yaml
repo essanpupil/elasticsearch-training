@@ -1,46 +1,51 @@
 ---
-- name: install elasticsearch logstash and kibana
-  hosts: kibana
-  gather_facts: true
+# Play 1: Generate the token on the active Elasticsearch node
+- name: Generate Kibana enrollment token
+  hosts: node1  # Replace with your Elasticsearch initial/master node
   become: true
   tasks:
-    - name: Install Kibana
-      ansible.builtin.yum:
+    - name: Generate enrollment token for Kibana
+      ansible.builtin.command: /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana
+      register: token_output
+      changed_when: false  # Generating a token doesn't change system configuration
+
+    - name: Store token as a fact for the Kibana play
+      ansible.builtin.set_fact:
+        kibana_enrollment_token: "{{ token_output.stdout | trim }}"
+
+# Play 2: Install and configure Kibana on the target node
+- name: Install and enroll Kibana
+  hosts: webui  # Replace with your Kibana node inventory name
+  become: true
+  tasks:
+    - name: Install Kibana package
+      ansible.builtin.apt:
         name: kibana
         state: present
+        update_cache: true
 
-    - name: Start and enable Kibana service
-      ansible.builtin.systemd_service:
-        name: kibana
-        state: started
-        enabled: yes
+    # - name: Check if Kibana is already enrolled
+    #   ansible.builtin.command: grep -q "elasticsearch.hosts" /etc/kibana/kibana.yml
+    #   register: kibana_configured
+    #   failed_when: false
+    #   changed_when: false
 
-    - name: Check if elasticsearch.password exists in Kibana keystore
-      ansible.builtin.command:
-        cmd: /usr/share/kibana/bin/kibana-keystore list
-      register: keystore_list
-      changed_when: false
+    - name: Run Kibana setup with enrollment token
+      ansible.builtin.command: >
+        /usr/share/kibana/bin/kibana-setup 
+        --enrollment-token {{ hostvars['node1']['kibana_enrollment_token'] }}
+      # when: kibana_configured.rc != 0
 
-    - name: Remove old password from keystore if it exists
-      ansible.builtin.command:
-        cmd: /usr/share/kibana/bin/kibana-keystore remove elasticsearch.password
-      when: "'elasticsearch.password' in keystore_list.stdout"
+    # - name: Deploy Kibana configuration
+    #   ansible.builtin.template:
+    #     src: kibana.yml.j2
+    #     dest: /etc/kibana/kibana.yml
+    #     owner: root
+    #     group: kibana
+    #     mode: '0660'
 
-    - name: Add new password to Kibana secure keystore
-      ansible.builtin.shell:
-        cmd: echo "{{ kibana_system_password }}" | /usr/share/kibana/bin/kibana-keystore add elasticsearch.password --stdin
-      no_log: true
-
-    - name: Deploy Kibana configuration
-      ansible.builtin.template:
-        src: kibana.yml.j2
-        dest: /etc/kibana/kibana.yml
-        owner: root
-        group: kibana
-        mode: '0660'
-
-    - name: Start and enable Kibana service
-      ansible.builtin.systemd_service:
+    - name: Enable and start Kibana service
+      ansible.builtin.systemd:
         name: kibana
         state: restarted
-        enabled: yes
+        enabled: true
