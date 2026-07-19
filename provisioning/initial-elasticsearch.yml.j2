@@ -5,7 +5,7 @@ path.data: /var/lib/elasticsearch
 path.logs: /var/log/elasticsearch
 
 network.host: {{ ansible_host }}
-
+network.publish_host: {{ ansible_host }}
 
 
 xpack.security.enabled: true
@@ -21,6 +21,7 @@ xpack.security.transport.ssl:
   truststore.path: certs/transport.p12
 
 cluster.initial_master_nodes: ["node1"]
-http.host: 0.0.0.0
+http.host: {{ ansible_host }}
 
 transport.host: {{ ansible_host }}
+transport.publish_host: {{ ansible_host }}
