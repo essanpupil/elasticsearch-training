@@ -64,8 +64,8 @@
       ansible.builtin.shell: |
         echo "y" | /usr/share/elasticsearch/bin/elasticsearch-reconfigure-node --enrollment-token {{ hostvars['node1']['token_output']['stdout'] | trim }}
       register: join_output
-      args:
-        creates: /etc/elasticsearch/certs/transport.p12
+      # args:
+      #   creates: /etc/elasticsearch/certs/transport.p12
 
     - name: debug join 
       debug:
