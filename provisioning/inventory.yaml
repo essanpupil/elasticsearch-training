@@ -23,10 +23,10 @@ all:
               ansible_host: 10.0.3.85
             node3:
               ansible_host: 10.0.3.232
-        ingerster:
-          hosts:
-            logstash:
-              ansible_host: 192.168.33.54
+        # ingerster:
+        #   hosts:
+        #     logstash:
+        #       ansible_host: 192.168.33.54
         webui:
           hosts:
             kibana:
