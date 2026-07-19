@@ -17,7 +17,7 @@ resource "aws_vpc_security_group_ingress_rule" "allow_http_from_internet" {
   from_port   = 80
   to_port     = 80
   ip_protocol = "tcp"
-  cidr_ipv4   = "180.254.78.9/32"
+  cidr_ipv4   = "0.0.0.0/0"
 }
 
 resource "aws_vpc_security_group_ingress_rule" "allow_https_from_internet" {
