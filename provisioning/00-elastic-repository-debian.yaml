@@ -1,0 +1,32 @@
+---
+- name: Configure Elastic Repository on Debian Hosts
+  hosts: all
+  become: yes
+  vars:
+    # Match the major version you need (e.g., '8.x', '9.x')
+    elastic_version: '9.x'
+    elastic_gpg_url: 'https://artifacts.elastic.co/GPG-KEY-elasticsearch'
+    elastic_gpg_path: '/usr/share/keyrings/elasticsearch-keyring.asc'
+
+  tasks:
+    - name: Download the official Elastic GPG key
+      ansible.builtin.get_url:
+        url: "{{ elastic_gpg_url }}"
+        dest: "{{ elastic_gpg_path }}"
+        mode: '0644'
+        owner: root
+        group: root
+
+    - name: Add official Elastic repository (deb822 format)
+      ansible.builtin.deb822_repository:
+        name: elastic
+        types: deb
+        uris: "https://artifacts.elastic.co/packages/{{ elastic_version }}/apt"
+        suites: stable
+        components: main
+        signed_by: "{{ elastic_gpg_path }}"
+        state: present
+
+    - name: Refresh apt cache with new repository
+      ansible.builtin.apt:
+        update_cache: yes
