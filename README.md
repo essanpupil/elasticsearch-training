@@ -19,9 +19,47 @@
 
 ## Some answers we are looking:
 1. What did you choose to automate the provisioning and bootstrapping of the instance? Why?
+   1. *ANSWER* For aws resources, i prefer using terraform to configure it. For instance privisioning and application configuration i prefer to use ansible. The concept that use is, terraform is good for immutable infra resources handling, while ansible is better for mutable resources or application configuration. Looking at the static and strict character of elasticsearch with its config, i suggest we use hashicorp consul for easier configuration management. This is because oftentimes we need to modify existing nodes when we have new nodes join the cluster. We can also implement cicd automation for the infra automation to help managing the resources.
+
 2. How did you choose to secure ElasticSearch? Why?
+   1. *ANSWER* Elasticsearch cluster communication is secured using ssl certificates for mutual TLS connection among elasticsearch nodes. We also use tls connection from http client such as kibana to elasticsearch. Elasticsearch provide elasticsearch-certutil built in binary command line to generate token and enroll to initial master node using the token. Elasticsearch certutil also available to generate token for kibana.
+
 3. How would you monitor this instance? What metrics would you monitor?
+   1. *ANSWER* We should deploy another monitoring system such as grafana + prometheus + loki to monitor the current ELK stack. But we will carefully select core system metric and logging that affect the ELK stack performance. This is to cover when something happen to the elk stack, and we totally can open the kibana web, we still have way to monitor and detect for suspicious log event. ELK stack will be focusing on serving search service.
+
 4. Could you extend your solution to launch a secure cluster of ElasticSearch nodes? What would need to change to support this use case?
+   1. *ANSWER* We need external credentials storage such as hashicorp vault or AWS Secret manager. We will keep all sensitive information inside the vault, then modify ansible and terraform to read or write to the vault if needed. For user access, we can apply AWS cognito or other similar service to avoid direct auth handling by kibana. This is also for easier user management to integrate kibana access with company roles and policy. 
+
 5. Could you extend your solution to replace a running ElasticSearch instance with little or no downtime? How?
+   1. *ANSWER* For maintenance, if we want to replace existing instance the procedures are:
+      1. Deploy the new instance, configure and register to the cluster.
+      2. Wait few minutes to make sure all data, shards, and indices are synchronized to the new nodes.
+      3. Configure elasticsearch to empty the problematic node.
+      4. Check does the problematic node is 100% sure do not store data anymore.
+      5. Unregister the problematic node from elasticsearch cluster.
+
 6. Was it a priority to make your code well structured, extensible, and reusable?
+   1. *ANSWER* We need to create dedicated ansible playbook for various operational task such as cluster initiation, new join node to existing cluster, simple config change, user management such as password reset, etc. This is my take away from working on this test. We can not risk changing something unrelated to our intention. For eample when we want to reconfigure elasticsearch node name, we might change cluster join certificate if the playbook is not separated.
+
 7. What sacrifices did you make due to time?
+   1. I do not deploy CICD to automatically check plan and run terraform or ansible changes
+   2. I do not deploy logstash for data ingestion
+   3. I do not deploy queue system to handle big traffic data ingestion to elasticsearch
+   4. I do not use aws secret manager or hashicorp vault to store sensitive data.
+
+
+# Final Architecture
+## AWS VPC with three subnets:
+### public subnet
+This subnet is directly accessible from internet. This subnet is used to be the interface from public internet to our system. Inside this public subnet we deploy:
+1. Application Load Balancer. It is used to interact user with kibana webserver
+2. nat-instance. This a nat instance type from aws. This is to provide internet connection from private subnet to internet. So that instances inside private subnet can do updates and installations. nat-instance is choosen because it is relatively cheaper compare with other types of nat gateway in aws.
+
+### private subnet
+This subnet is not accesible directly from internet, but we still allow outbond connection to internet. This subnet is used to deploy our internal system such as kibana and logstash (not included). In current settings, instances that are deployed in private subnet are
+1. kibana, we server interface to manage elasticsearch
+2. bastion, used to connect and managed other service by engineer
+
+### data subnet
+This subnet is not accessible from internet, and also do not have outbond connection to intenret. The outbond internet connection is sometimes will be allowed for installation and updates. The resources deploy in this subnet are:
+1. elasticsearch cluster nodes
