@@ -11,7 +11,7 @@ all:
         ansible_user: admin
         ansible_port: 22
         ansible_ssh_common_args: "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PasswordAuthentication=no -o IdentitiesOnly=yes -o LogLevel=FATAL -o PubkeyAcceptedKeyTypes=+ssh-rsa -o HostKeyAlgorithms=+ssh-rsa"
-        ansible_python_interpreter: /usr/bin/python3.13
+        ansible_python_interpreter: /usr/bin/python3
       children:
         es-initial:
           hosts:
