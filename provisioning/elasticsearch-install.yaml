@@ -11,7 +11,7 @@
 
     - name: Deploy Elasticsearch configuration
       ansible.builtin.template:
-        src: cluster-elasticsearch.yml.j2
+        src: initial-elasticsearch.yml.j2
         dest: /etc/elasticsearch/elasticsearch.yml
         owner: root
         group: elasticsearch
@@ -43,13 +43,13 @@
         name: "elasticsearch"
         state: present
 
-    - name: Deploy Elasticsearch configuration
-      ansible.builtin.template:
-        src: cluster-elasticsearch.yml.j2
-        dest: /etc/elasticsearch/elasticsearch.yml
-        owner: root
-        group: elasticsearch
-        mode: '0660'
+    # - name: Deploy Elasticsearch configuration
+    #   ansible.builtin.template:
+    #     src: cluster-elasticsearch.yml.j2
+    #     dest: /etc/elasticsearch/elasticsearch.yml
+    #     owner: root
+    #     group: elasticsearch
+    #     mode: '0660'
 
     - name: Run Elasticsearch reconfigure utility using enrollment token
       ansible.builtin.command: |
