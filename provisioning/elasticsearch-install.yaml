@@ -58,14 +58,15 @@
         update_cache: true
 
     # expect module still failed after try again
-    - name: Run Elasticsearch reconfigure utility using enrollment token
-      ansible.builtin.expect:
-        command: /usr/share/elasticsearch/bin/elasticsearch-reconfigure-node --enrollment-token {{ hostvars['node1']['token_output']['stdout'] | trim }}
-        responses:
-          '(?i)Do you want to continue with the reconfiguration process.*': 'y'
-      # args:
-      #   creates: /etc/elasticsearch/certs/transport.p12
-      register: join_output
+    # CONFIRMED FAILURE
+    # - name: Run Elasticsearch reconfigure utility using enrollment token
+    #   ansible.builtin.expect:
+    #     command: /usr/share/elasticsearch/bin/elasticsearch-reconfigure-node --enrollment-token {{ hostvars['node1']['token_output']['stdout'] | trim }}
+    #     responses:
+    #       '(?i)Do you want to continue with the reconfiguration process.*': 'y'
+    #   # args:
+    #   #   creates: /etc/elasticsearch/certs/transport.p12
+    #   register: join_output
 
     # - name: Run Elasticsearch reconfigure utility using enrollment token
     #   ansible.builtin.shell: |
@@ -74,27 +75,27 @@
       # args:
       #   creates: /etc/elasticsearch/certs/transport.p12
 
-    - name: debug join 
-      debug:
-        msg: "{{ join_output }}"
+    # - name: debug join 
+    #   debug:
+    #     msg: "{{ join_output }}"
 
-    - name: Deploy Elasticsearch configuration
-      ansible.builtin.template:
-        src: es-join-elasticsearch.yml.j2
-        dest: /etc/elasticsearch/elasticsearch.yml
-        owner: root
-        group: elasticsearch
-        mode: '0660'
+    # - name: Deploy Elasticsearch configuration
+    #   ansible.builtin.template:
+    #     src: es-join-elasticsearch.yml.j2
+    #     dest: /etc/elasticsearch/elasticsearch.yml
+    #     owner: root
+    #     group: elasticsearch
+    #     mode: '0660'
 
-    - name: Ensure Elasticsearch service is enabled and started
-      ansible.builtin.systemd:
-        name: elasticsearch
-        state: started
-        enabled: true
+    # - name: Ensure Elasticsearch service is enabled and started
+    #   ansible.builtin.systemd:
+    #     name: elasticsearch
+    #     state: started
+    #     enabled: true
 
-    - name: Wait for 10 seconds for nodes to completely settle down
-      ansible.builtin.pause:
-        seconds: 5
+    # - name: Wait for 10 seconds for nodes to completely settle down
+    #   ansible.builtin.pause:
+    #     seconds: 5
 
 - name: Confirm elasticsearch cluster
   hosts: es-initial
