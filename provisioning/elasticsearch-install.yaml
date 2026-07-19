@@ -50,14 +50,22 @@
       #   - The [certs] config directory will be removed
       #   - Security auto configuration related secure settings will be removed from the elasticsearch.keystore
       # Do you want to continue with the reconfiguration process [y/N]y
+    # Using expect module works in vagranbot debian 13 but does not works in aws ami-0e68dc81dc36750a1 (debian 13)
+    # - name: Run Elasticsearch reconfigure utility using enrollment token
+    #   ansible.builtin.expect:
+    #     command: /usr/share/elasticsearch/bin/elasticsearch-reconfigure-node --enrollment-token {{ hostvars['node1']['token_output']['stdout'] | trim }}
+    #     responses:
+    #       '(?i)Do you want to continue with the reconfiguration process.*': 'y'
+    #   # args:
+    #   #   creates: /etc/elasticsearch/certs/transport.p12
+    #   register: join_output
+
     - name: Run Elasticsearch reconfigure utility using enrollment token
-      ansible.builtin.expect:
-        command: /usr/share/elasticsearch/bin/elasticsearch-reconfigure-node --enrollment-token {{ hostvars['node1']['token_output']['stdout'] | trim }}
-        responses:
-          '(?i)Do you want to continue with the reconfiguration process.*': 'y'
-      # args:
-      #   creates: /etc/elasticsearch/certs/transport.p12
+      ansible.builtin.shell: |
+        echo "y" | /usr/share/elasticsearch/bin/elasticsearch-reconfigure-node --enrollment-token {{ hostvars['node1']['token_output']['stdout'] | trim }}
       register: join_output
+      args:
+        creates: /etc/elasticsearch/certs/transport.p12
 
     - name: debug join 
       debug:
