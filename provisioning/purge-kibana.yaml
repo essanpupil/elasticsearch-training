@@ -1,0 +1,17 @@
+---
+- name: Purge kibana
+  hosts: webui
+  gather_facts: true
+  become: true
+  tasks:
+    - name: Purge a specific package and its configuration files
+      ansible.builtin.apt:
+        name: kibana
+        state: absent
+        purge: true
+    - name: Remove Elasticsearch data directory and transport certificate
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /var/lib/kibana
