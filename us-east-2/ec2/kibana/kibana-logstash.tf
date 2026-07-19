@@ -61,7 +61,7 @@ resource "aws_instance" "kibana" {
     systemctl start sshd
     systemctl enable sshd
 
-    TARGET_USER="ec2-user"
+    TARGET_USER="admin"
     USER_HOME="/home/$TARGET_USER"
     SSH_DIR="$USER_HOME/.ssh"
 

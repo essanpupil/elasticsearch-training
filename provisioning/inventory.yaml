@@ -16,13 +16,13 @@ all:
         es-initial:
           hosts:
             node1:
-              ansible_host: 10.0.3.210
+              ansible_host: 10.0.3.238
         es-join:
           hosts:
             node2:
-              ansible_host: 10.0.3.85
+              ansible_host: 10.0.3.195
             node3:
-              ansible_host: 10.0.3.232
+              ansible_host: 10.0.3.77
         # ingerster:
         #   hosts:
         #     logstash:
@@ -30,5 +30,4 @@ all:
         webui:
           hosts:
             kibana:
-              ansible_host: 10.0.2.127
-              ansible_port: 22
+              ansible_host: 10.0.2.95
