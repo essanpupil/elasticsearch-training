@@ -20,6 +20,22 @@ resource "aws_security_group" "this" {
   }
 }
 
+resource "aws_vpc_security_group_ingress_rule" "elasticsearch_http_node" {
+  security_group_id = aws_security_group.this.id
+  referenced_security_group_id = aws_security_group.this.id
+  from_port   = 9200
+  ip_protocol = "tcp"
+  to_port     = 9200
+}
+
+resource "aws_vpc_security_group_ingress_rule" "elasticsearch_transport_node" {
+  security_group_id = aws_security_group.this.id
+  referenced_security_group_id = aws_security_group.this.id
+  from_port   = 9300
+  ip_protocol = "tcp"
+  to_port     = 9300
+}
+
 resource "aws_vpc_security_group_ingress_rule" "elasticsearch_access" {
   security_group_id = aws_security_group.this.id
   referenced_security_group_id = data.terraform_remote_state.kibana.outputs.security_group_id
