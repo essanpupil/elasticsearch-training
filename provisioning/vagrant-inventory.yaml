@@ -8,23 +8,25 @@ all:
         ansible_user: vagrant
         ansible_ssh_common_args: "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PasswordAuthentication=no -o IdentitiesOnly=yes -o LogLevel=FATAL -o PubkeyAcceptedKeyTypes=+ssh-rsa -o HostKeyAlgorithms=+ssh-rsa"
       children:
-        elasticsearch:
-            hosts:
-              node1:
-                ansible_host: 192.168.33.51
-                ansible_port: 22
-                ansible_ssh_private_key_file: "/Users/essan/Code/elasticsearch-training/provisioning/.vagrant/machines/node1/virtualbox/private_key"
-                ansible_python_interpreter: /usr/bin/python3.13
-              node2:
-                ansible_host: 192.168.33.52
-                ansible_port: 22
-                ansible_ssh_private_key_file: "/Users/essan/Code/elasticsearch-training/provisioning/.vagrant/machines/node2/virtualbox/private_key"
-                ansible_python_interpreter: /usr/bin/python3.13
-              node3:
-                ansible_host: 192.168.33.53
-                ansible_port: 22
-                ansible_ssh_private_key_file: "/Users/essan/Code/elasticsearch-training/provisioning/.vagrant/machines/node3/virtualbox/private_key"
-                ansible_python_interpreter: /usr/bin/python3.13
+        es-initial:
+          hosts:
+            node1:
+              ansible_host: 192.168.33.51
+              ansible_port: 22
+              ansible_ssh_private_key_file: "/Users/essan/Code/elasticsearch-training/provisioning/.vagrant/machines/node1/virtualbox/private_key"
+              ansible_python_interpreter: /usr/bin/python3.13
+        es-join:
+          hosts:
+            node2:
+              ansible_host: 192.168.33.52
+              ansible_port: 22
+              ansible_ssh_private_key_file: "/Users/essan/Code/elasticsearch-training/provisioning/.vagrant/machines/node2/virtualbox/private_key"
+              ansible_python_interpreter: /usr/bin/python3.13
+            node3:
+              ansible_host: 192.168.33.53
+              ansible_port: 22
+              ansible_ssh_private_key_file: "/Users/essan/Code/elasticsearch-training/provisioning/.vagrant/machines/node3/virtualbox/private_key"
+              ansible_python_interpreter: /usr/bin/python3.13
         logstash:
           hosts:
             logstash:
