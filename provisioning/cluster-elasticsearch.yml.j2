@@ -14,7 +14,7 @@
 #
 # Use a descriptive name for your cluster:
 #
-#cluster.name: my-application
+cluster.name: {{ elasticsearch_cluster_name }}
 #
 # ------------------------------------ Node ------------------------------------
 #
@@ -53,7 +53,7 @@ path.logs: /var/log/elasticsearch
 # By default Elasticsearch is only accessible on localhost. Set a different
 # address here to expose this node on the network:
 #
-#network.host: 192.168.0.1
+network.host: {{ ansible_host }}
 #
 # By default Elasticsearch listens for HTTP traffic on the first free port it
 # finds starting at 9200. Set a specific HTTP port here:
@@ -114,4 +114,4 @@ http.host: 0.0.0.0
 
 # Allow other nodes to join the cluster from anywhere
 # Connections are encrypted and mutually authenticated
-#transport.host: 0.0.0.0
+transport.host: {{ ansible_host }}
