@@ -24,25 +24,19 @@
         state: present
         update_cache: true
 
-    # - name: Check if Kibana is already enrolled
-    #   ansible.builtin.command: grep -q "elasticsearch.hosts" /etc/kibana/kibana.yml
-    #   register: kibana_configured
-    #   failed_when: false
-    #   changed_when: false
+    - name: Deploy Kibana configuration
+      ansible.builtin.template:
+        src: kibana.yml.j2
+        dest: /etc/kibana/kibana.yml
+        owner: root
+        group: kibana
+        mode: '0660'
 
     - name: Run Kibana setup with enrollment token
       ansible.builtin.command: >
         /usr/share/kibana/bin/kibana-setup 
         --enrollment-token {{ hostvars['node1']['kibana_enrollment_token'] }}
       # when: kibana_configured.rc != 0
-
-    # - name: Deploy Kibana configuration
-    #   ansible.builtin.template:
-    #     src: kibana.yml.j2
-    #     dest: /etc/kibana/kibana.yml
-    #     owner: root
-    #     group: kibana
-    #     mode: '0660'
 
     - name: Enable and start Kibana service
       ansible.builtin.systemd:

@@ -4,9 +4,9 @@ all:
     es_config_dir: "/etc/elasticsearch"
     elastic_password: "PlainUnsecurePasswd90-/."
     kibana_system_password: "*W2h3gHEW46Zr_aCq=C="
-    kibana_encryption_key: "6MMj3wv3+A2bvIk+9BUhJ0s0OpZq7Jaq"
-    kibana_reporting_key: bb66a11669aea3a038b440611f9b26649d23d76ad513210a94e5cfe644a1c5a0
-    kibana_security_key: 4c07ee984d40d1392363ff74c7ef48d97565f541d8ab6d7c77e29aa9d2448f30
+    kibana_object_key: 6e15a830e2bbda9cb530c5eed71ae518caecc11f016f8be2de5e30df5a766e30
+    kibana_reporting_key: 126b030b54d221a0247878c67c1cec724e3ffc4afbc6fbd58fa63d0ebc8c4bfa
+    kibana_security_key: 928737613e9156e1b7a3bfc03d6213282956518fa8839d79b57c8aeef283b70a
     elasticsearch_cluster_name: observability
   children:
     kibana:

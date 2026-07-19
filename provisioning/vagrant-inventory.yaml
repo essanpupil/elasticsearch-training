@@ -2,6 +2,9 @@ all:
   vars:
     elasticsearch_cluster_name: observability
     elasticsearch_elastic_password: v7YXq2WOlP3J9LXuXLbA
+    kibana_object_key: 6e15a830e2bbda9cb530c5eed71ae518caecc11f016f8be2de5e30df5a766e30
+    kibana_reporting_key: 126b030b54d221a0247878c67c1cec724e3ffc4afbc6fbd58fa63d0ebc8c4bfa
+    kibana_security_key: 928737613e9156e1b7a3bfc03d6213282956518fa8839d79b57c8aeef283b70a
   children:
     elastic_stack:
       vars:
