@@ -2,16 +2,16 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "cloud-image/amazon-linux-2023"
-  config.vm.box_version = "12.20260710.0"
+  config.vm.box = "cloud-image/debian-13"
+  # config.vm.box_version = "12.20260710.0"
 
   # Define the Virtual Machines
   vms = {
-    "es-node-1" => { "ip" => "192.168.1.51", "ram" => 2048 },
-    "es-node-2" => { "ip" => "192.168.1.52", "ram" => 2048 },
-    "es-node-3" => { "ip" => "192.168.1.53", "ram" => 2048 },
-    "logstash"  => { "ip" => "192.168.1.54", "ram" => 1024 },
-    "kibana"    => { "ip" => "192.168.1.55", "ram" => 1024 }
+    "node1"     => { "ip" => "192.168.33.51", "ram" => 2048, "port" => 2200 },
+    "node2"     => { "ip" => "192.168.33.52", "ram" => 2048, "port" => 2201 },
+    "node3"     => { "ip" => "192.168.33.53", "ram" => 2048, "port" => 2202 },
+    "logstash"  => { "ip" => "192.168.33.54", "ram" => 1024, "port" => 2203 },
+    "kibana"    => { "ip" => "192.168.33.55", "ram" => 1024, "port" => 2204 }
   }
 
   # Loop to generate each machine automatically
@@ -20,9 +20,7 @@ Vagrant.configure("2") do |config|
       node.vm.hostname = hostname
       
       # Bridged network with static IP configuration
-      node.vm.network "public_network", 
-        bridge: "en0: Wi-Fi",
-        ip: settings["ip"]
+      node.vm.network "private_network", ip: settings["ip"]
 
       # Hardware resource allocation
       node.vm.provider "virtualbox" do |v|
