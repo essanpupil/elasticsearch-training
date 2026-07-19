@@ -20,7 +20,15 @@ xpack.security.transport.ssl:
   keystore.path: certs/transport.p12
   truststore.path: certs/transport.p12
 
-cluster.initial_master_nodes: ["node1"]
+discovery.seed_hosts:
+{% for host in groups['es-initial'] %}
+  - {{ hostvars[host]['ansible_host'] | default(host) }}
+{% endfor %}
+{% for host in groups['es-join'] %}
+  - {{ hostvars[host]['ansible_host'] | default(host) }}
+{% endfor %}
+
+cluster.initial_master_nodes: ["{{ inventory_hostname }}"]
 http.host: {{ ansible_host }}
 
 transport.host: {{ ansible_host }}
