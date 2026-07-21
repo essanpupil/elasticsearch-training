@@ -1,3 +1,73 @@
+# How to Deploy
+Follow this step by step guide to deploy elasticsearch system:
+1. Prepare AWS account and permission to create the following resources:
+   1. vpc
+   2. route table
+   3. subnets
+   4. ec2
+   5. security group
+2. Install Terraform and Ansible to laptop
+3. Pull this repo: `git clone https://github.com/essanpupil/elasticsearch-training.git`
+4. Enter directory: `cd elasticsearch-training`
+5. Authenticate to aws
+6. Deploy S3 bucket for the terraform state
+   1. Enter terraform state directory: `cd us-east-2/s3/terraform-state`
+   2. Initiate terraform: `terraform init`
+   3. Check current terraform plan: `terraform plan`
+   4. If everything is OK, then apply it: `terrafrom apply`
+7. Deploy VPC, subnets, and gateways:
+   1. Enter VPC directory: `cd us-east-2/vpc`
+   2. Initiate terraform: `terraform init`
+   3. Check current terraform plan: `terraform plan`
+   4. If everything is OK, then apply it: `terrafrom apply`
+8. Deploy bastion instance:
+   1. Enter bastion directory: `us-east-2/ec2/bastion`
+   2. Initiate terraform: `terraform init`
+   3. Check current terraform plan: `terraform plan`
+   4. If everything is OK, apply the config: `terrafom apply`
+9.  Deploy kibana instance:
+   1. Enter kibana directory: `us-east-2/ec2/kibana`
+   2. Initiate terraform: `terraform init`
+   3. Check current terraform plan: `terraform plan`
+   4. If everything is OK, apply the config: `terrafom apply`
+10. Deploy elasticsearch instances:
+   1. Enter elasticsearch directory: `us-east-2/ec2/elasticsearch`
+   2. Initiate terraform: `terraform init`
+   3. Check current terraform plan: `terraform plan`
+   4. If everything is OK, apply the config: `terrafom apply`
+11. Deploy ALB:
+   1. Enter alb directory: `us-east-2/alb`
+   2. Initiate terraform: `terraform init`
+   3. Check current terraform plan: `terraform plan`
+   4. If everything is OK, apply the config: `terrafom apply`
+13. Start ssm connection to bastion instance.
+14. Install git cli on the bastion instance
+15. Pull this repository to bastion instance: `git clone https://github.com/essanpupil/elasticsearch-training.git`
+16. Enter provisioning directory: `cd provisioning/`
+17. Update `inventory.yaml` file with the IP address of private ip address of created kibana and elasticsearch.
+18. Install elastic repository: `ansible-playbook 00-elastic-repository-debian.yaml`
+19. provision elasticsearch: `ansible-playbook elasticsearch-install.yaml`
+20. provision kibana: `ansible-playbook kibana-install.yaml`
+21. Check created plubic dns of the alb.
+22. Open kibana web page from the alb public dns.
+
+
+# Final Architecture
+## AWS VPC with three subnets:
+### public subnet
+This subnet is directly accessible from internet. This subnet is used to be the interface from public internet to our system. Inside this public subnet we deploy:
+1. Application Load Balancer. It is used to interact user with kibana webserver
+2. nat-instance. This a nat instance type from aws. This is to provide internet connection from private subnet to internet. So that instances inside private subnet can do updates and installations. nat-instance is choosen because it is relatively cheaper compare with other types of nat gateway in aws.
+
+### private subnet
+This subnet is not accesible directly from internet, but we still allow outbond connection to internet. This subnet is used to deploy our internal system such as kibana and logstash (not included). In current settings, instances that are deployed in private subnet are
+1. kibana, we server interface to manage elasticsearch
+2. bastion, used to connect and managed other service by engineer
+
+### data subnet
+This subnet is not accessible from internet, and also do not have outbond connection to intenret. The outbond internet connection is sometimes will be allowed for installation and updates. The resources deploy in this subnet are:
+1. elasticsearch cluster nodes
+
 ## Following is the goals of the exercise:
 1. Demonstrate your hands-on skills, you can code for building cloud hosted solution
 2. Demonstrate that you can think of other cross-cutting-concerns like security
@@ -46,20 +116,3 @@
    2. I do not deploy logstash for data ingestion
    3. I do not deploy queue system to handle big traffic data ingestion to elasticsearch
    4. I do not use aws secret manager or hashicorp vault to store sensitive data.
-
-
-# Final Architecture
-## AWS VPC with three subnets:
-### public subnet
-This subnet is directly accessible from internet. This subnet is used to be the interface from public internet to our system. Inside this public subnet we deploy:
-1. Application Load Balancer. It is used to interact user with kibana webserver
-2. nat-instance. This a nat instance type from aws. This is to provide internet connection from private subnet to internet. So that instances inside private subnet can do updates and installations. nat-instance is choosen because it is relatively cheaper compare with other types of nat gateway in aws.
-
-### private subnet
-This subnet is not accesible directly from internet, but we still allow outbond connection to internet. This subnet is used to deploy our internal system such as kibana and logstash (not included). In current settings, instances that are deployed in private subnet are
-1. kibana, we server interface to manage elasticsearch
-2. bastion, used to connect and managed other service by engineer
-
-### data subnet
-This subnet is not accessible from internet, and also do not have outbond connection to intenret. The outbond internet connection is sometimes will be allowed for installation and updates. The resources deploy in this subnet are:
-1. elasticsearch cluster nodes
